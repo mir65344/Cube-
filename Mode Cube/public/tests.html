@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тесты эмоционального интеллекта</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Тесты Эмоционального Интеллекта</h1>
+            <p class="subtitle">Пройдите тесты чтобы лучше понять свои эмоции и улучшить эмоциональное состояние</p>
+        </header>
+
+        <nav class="page-nav">
+            <a href="index.html" class="nav-btn">Главная</a>
+            <a href="tests.html" class="nav-btn active">Тесты EQ</a>
+        </nav>
+
+        <div class="cube-container">
+            <div class="cube" id="cube">
+                <div class="face front"></div>
+                <div class="face back"></div>
+                <div class="face right"></div>
+                <div class="face left"></div>
+                <div class="face top"></div>
+                <div class="face bottom"></div>
+            </div>
+        </div>
+
+        <div class="quiz-container">
+            <h2>Тест на эмоциональный интеллект</h2>
+            
+            <!-- Прогресс бар -->
+            <div class="progress-container">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress-fill"></div>
+                </div>
+                <div class="progress-text" id="progress-text">Вопрос 1 из 7</div>
+            </div>
+            
+            <!-- Индикатор типа теста -->
+            <div class="test-type-indicator" id="test-type-indicator">
+                Теоретическая часть
+            </div>
+            
+            <div id="eq-test">
+                <!-- тест будет загружен через Javascript -->
+            </div>
+            
+            <button class="submit-btn" id="submit-eq" style="display: none;">Завершить тест</button>
+            <div class="result" id="eq-result"></div>
+            <div class="recommendations" id="eq-recommendations" style="display: none;"></div>
+            
+            <!-- Детальные результаты -->
+            <div class="detailed-results" id="detailed-results" style="display: none;">
+                <h3>Детальный анализ вашего EQ</h3>
+                <div class="aspects-grid" id="aspects-grid"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/cube.js"></script>
+    <script src="js/eq-tests.js"></script>
+</body>
+</html>

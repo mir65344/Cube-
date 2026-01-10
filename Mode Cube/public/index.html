@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Интерактивный куб настроения</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container">5
+        <header>
+            <h1>Куб Настроения</h1>
+            <p class="subtitle">Покрутите фигуру и пройдите тест, чтобы увидеть как она fменяет цвет и получить рекомендации</p>
+        </header>
+
+        <nav class="page-nav">
+            <a href="index.html" class="nav-btn active">Главная</a>
+            <a href="tests.html" class="nav-btn">Тесты EQ</a>
+        </nav>
+
+        <div class="cube-container">
+            <div class="cube" id="cube">
+                <div class="face front"></div>
+                <div class="face back"></div>
+                <div class="face right"></div>
+                <div class="face left"></div>
+                <div class="face top"></div>
+                <div class="face bottom"></div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button id="rotateX">Вращать по X</button>
+            <button id="rotateY">Вращать по Y</button>
+            <button id="rotateZ">Вращать по Z</button>
+            <button id="reset">Сбросить</button>
+        </div>
+
+        <div class="quiz-container">
+            <h2>Как у вас дела? Пройдите тест и куб изменит цвет, отражая ваше настроение!</h2>
+            
+            <div class="question">
+                <h3>1. Как вы себя чувствуете сегодня?</h3>
+                <div class="options">
+                    <div class="option" data-value="1">Отлично, полон энергии</div>
+                    <div class="option" data-value="2">Хорошо, всё нормально</div>
+                    <div class="option" data-value="3">Немного устал(а)</div>
+                    <div class="option" data-value="4">Плохо, нет сил</div>
+                </div>
+            </div>
+            
+            <div class="question">
+                <h3>2. Как ваше настроение?</h3>
+                <div class="options">
+                    <div class="option" data-value="1">Прекрасное, радуюсь жизни</div>
+                    <div class="option" data-value="2">Спокойное, уравновешенное</div>
+                    <div class="option" data-value="3">Немного тревожное</div>
+                    <div class="option" data-value="4">Подавленное, грустное</div>
+                </div>
+            </div>
+            
+            <div class="question">
+                <h3>3. Насколько вы удовлетворены своей жизнью в последнее время?</h3>
+                <div class="options">
+                    <div class="option" data-value="1">Полностью удовлетворен(а)</div>
+                    <div class="option" data-value="2">В основном доволен(а)</div>
+                    <div class="option" data-value="3">Есть некоторые проблемы</div>
+                    <div class="option" data-value="4">Неудовлетворен(а) многим</div>
+                </div>
+            </div>
+
+            <div class="question">
+                <h3>4. Как вы спите?</h3>
+                <div class="options">
+                    <div class="option" data-value="1">Отлично, просыпаюсь отдохнувшим(ей)</div>
+                    <div class="option" data-value="2">Нормально, высыпаюсь</div>
+                    <div class="option" data-value="3">Периодически бывает бессонница</div>
+                    <div class="option" data-value="4">Плохо, постоянно не высыпаюсь</div>
+                </div>
+            </div>
+
+            <div class="question">
+                <h3>5. Как проходит ваш день?</h3>
+                <div class="options">
+                    <div class="option" data-value="1">Продуктивно и интересно</div>
+                    <div class="option" data-value="2">Обычно, без особых событий</div>
+                    <div class="option" data-value="3">Беспокойно и суетливо</div>
+                    <div class="option" data-value="4">Тяжело и утомительно</div>
+                </div>
+            </div>
+
+            <div class="question">
+                <h3>6. Как вы относитесь к будущему?</h3>
+                <div class="options">
+                    <div class="option" data-value="1">С оптимизмом и уверенностью</div>
+                    <div class="option" data-value="2">Спокойно, без особых ожиданий</div>
+                    <div class="option" data-value="3">С некоторой тревогой</div>
+                    <div class="option" data-value="4">С пессимизмом и беспокойством</div>
+                </div>
+            </div>
+            
+            <button class="submit-btn" id="submit">Узнать результат</button>
+            <div class="result" id="result"></div>
+            <div class="recommendations" id="recommendations" style="display: none;"></div>
+        </div>
+
+        <div class="user-stats">
+            <h3>Ваша статистика настроения за поледнюю неделю</h3>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <span class="stat-label">Текущий уровень</span>
+                    <span class="stat-value" id="mood-level">-</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Пройдено тестов</span>
+                    <span class="stat-value" id="tests-taken">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Средний балл</span>
+                    <span class="stat-value" id="average-score">-</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Последний результат</span>
+                    <span class="stat-value" id="last-result">-</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/cube.js"></script>
+    <script src="js/quiz.js"></script>
+</body>
+</html>

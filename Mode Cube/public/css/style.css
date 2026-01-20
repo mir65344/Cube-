@@ -533,9 +533,28 @@ h3 {
         font-size: 3rem;
     }
     
-    .cube .front, .cube .back, .cube .right, o
-    .cube .left, .cube .top, .cube .bottom {
-        transform: translateZ(125px);
+        .cube .front {
+        transform: rotateY(0deg) translateZ(125px);
+    }
+    
+    .cube .back {
+        transform: rotateY(180deg) translateZ(125px);
+    }
+    
+    .cube .right {
+        transform: rotateY(90deg) translateZ(125px);
+    }
+    
+    .cube .left {
+        transform: rotateY(-90deg) translateZ(125px);
+    }
+    
+    .cube .top {
+        transform: rotateX(90deg) translateZ(125px);
+    }
+    
+    .cube .bottom {
+        transform: rotateX(-90deg) translateZ(125px);
     }
     
     .stats-grid {
@@ -557,5 +576,28 @@ h3 {
     
     h2 {
         font-size: 1.5rem;
+    }
+    
+    /* ДОПОЛНИТЕЛЬНЫЕ ИСПРАВЛЕНИЯ ДЛЯ МОБИЛЬНЫХ УРААА */
+    .cube {
+        transform: rotateX(-10deg) rotateY(10deg); /* меньший угол */
+    }
+    
+    .cube-container {
+        perspective: 800px; /* меньшая перспектива */
+    }
+    
+    body {
+        padding: 20px 10px; /* меньшие отступы */
+    }
+    
+    button, .nav-btn {
+        padding: 12px 20px; /* увеличим кнопки для сенсора */
+        min-height: 44px; /* минимальная высота для тача */
+    }
+    
+    .option {
+        padding: 15px;
+        min-height: 44px; /* для удобного нажатия */
     }
 }

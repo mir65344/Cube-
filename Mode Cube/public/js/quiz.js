@@ -47,7 +47,7 @@ function checkAllQuestionsAnswered() {
 }
 
 // обработчик отправки теста
-submitBtn.addEventListener('click', async function() {
+submitBtn.addEventListener('click', function() {
     if (Object.keys(userAnswers).length < 6) {
         resultDiv.textContent = 'Пожалуйста, ответьте на все вопросы перед отправкой.';
         return;
@@ -68,50 +68,38 @@ submitBtn.addEventListener('click', async function() {
         window.cubeController.updateCubeColor(moodLevel);
     }
     
-    // сохраняем тест на сервере
-    const savedTest = await saveTestToServer(score, moodLevel);
-    
     // обновляем статистику
     updateStats(score, moodLevel);
-    
-    // Сохраняем данные теста для возможного углубленного теста
-    localStorage.setItem('lastMoodTest', JSON.stringify({
-        score,
-        testId: savedTest.testId,
-        needsDeepTest: savedTest.needsDeepTest,
-        date: new Date().toISOString()
-    }));
-    
-    // Предлагаем углубленный тест, если нужно
-    if (savedTest.needsDeepTest) {
-        showDeepTestOffer(score);
-    }
     
     testCompleted = true;
     submitBtn.disabled = true;
     submitBtn.textContent = 'Тест завершен';
 });
 
-// расчет общего балла
+// расчет общего балла - ПРАВИЛЬНАЯ ВЕРСИЯ
 function calculateScore() {
     let totalScore = 0;
     const totalQuestions = Object.keys(userAnswers).length;
     
     for (let i = 1; i <= totalQuestions; i++) {
+        // значения от 1 до 4, где 1 - лучший, 4 - худший
+        // преобразуем в шкалу 1-5 где 5 - лучший результат
         const answerValue = userAnswers[i];
         let convertedScore;
 
+        // оптимизация через switch case вместо else if
         switch(answerValue) {
-            case 1: convertedScore = 5; break;
-            case 2: convertedScore = 4; break;
-            case 3: convertedScore = 2; break;
-            case 4: convertedScore = 1; break;
-            default: convertedScore = 3;
+            case 1: convertedScore = 5; break; // Отлично
+            case 2: convertedScore = 4; break; // Хорошо
+            case 3: convertedScore = 2; break; // Немного устал/тревожно
+            case 4: convertedScore = 1; break; // Плохо
+            default: convertedScore = 3; // По умолчанию
         }
         
         totalScore += convertedScore;
     }
     
+    // средний балл от 1 до 5
     const averageScore = totalScore / totalQuestions;
     return Math.min(Math.max(averageScore, 1), 5);
 }
@@ -153,9 +141,13 @@ function highlightAnswers() {
         question.querySelectorAll('.option').forEach(option => {
             const optionValue = parseInt(option.getAttribute('data-value'));
             
+            // сбрасываем предыдущие классы
             option.classList.remove('selected', 'answer-1', 'answer-2', 'answer-3', 'answer-4', 'user-selected');
+            
+            // добавляем цвет в зависимости от значения ответа
             option.classList.add(`answer-${optionValue}`);
             
+            // помечаем ответ пользователя
             if (optionValue === userAnswer) {
                 option.classList.add('user-selected');
             }
@@ -214,30 +206,6 @@ function showRecommendations(moodLevel) {
     recommendationsDiv.style.display = 'block';
 }
 
-// сохранение теста на сервере
-async function saveTestToServer(score, moodLevel) {
-    try {
-        const response = await fetch('/api/save-mood-test', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                score: score,
-                moodLevel: getMoodText(moodLevel),
-                answers: userAnswers,
-                testType: 'basic'
-            })
-        });
-        
-        const data = await response.json();
-        return data;
-    } catch (error) {
-        console.error('Ошибка сохранения теста:', error);
-        return { success: false, testId: null, needsDeepTest: score < 3.5 };
-    }
-}
-
 // обновление статистики
 function updateStats(score, moodLevel) {
     const moodLevelElement = document.getElementById('mood-level');
@@ -255,19 +223,37 @@ function updateStats(score, moodLevel) {
         lastResultElement.textContent = `${score.toFixed(1)}/5`;
     }
     
+    // обновляем счетчик тестов
     if (testsTakenElement) {
         const currentCount = parseInt(testsTakenElement.textContent) || 0;
         testsTakenElement.textContent = currentCount + 1;
     }
     
+    // обновляем средний балл
     if (averageScoreElement) {
         const currentAvg = parseFloat(averageScoreElement.textContent) || score;
         const testsCount = parseInt(testsTakenElement.textContent) || 1;
         const newAvg = ((currentAvg * (testsCount - 1)) + score) / testsCount;
         averageScoreElement.textContent = newAvg.toFixed(1);
     }
+    
+    // сохраняем в localStorage
+    saveToLocalStorage(score, moodLevel);
 }
 
+// сохранение в localStorage
+function saveToLocalStorage(score, moodLevel) {
+    const testData = {
+        score: score,
+        moodLevel: moodLevel,
+        date: new Date().toISOString(),
+        answers: userAnswers
+    };
+    
+    const existingData = JSON.parse(localStorage.getItem('moodTests') || '[]');
+    existingData.push(testData);
+    localStorage.setItem('moodTests', JSON.stringify(existingData.slice(-10)));
+}
 
 // инициализация при загрузке страницы
 document.addEventListener('DOMContentLoaded', function() {
@@ -277,125 +263,21 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // загрузка истории тестов
-async function loadTestHistory() {
-    try {
-        const response = await fetch('/api/test-history?limit=5');
-        const data = await response.json();
+function loadTestHistory() {
+    const existingData = JSON.parse(localStorage.getItem('moodTests') || '[]');
+    
+    if (existingData.length > 0) {
+        const testsTakenElement = document.getElementById('tests-taken');
+        const averageScoreElement = document.getElementById('average-score');
+        const lastResultElement = document.getElementById('last-result');
         
-        if (data.tests && data.tests.length > 0) {
-            const testsTakenElement = document.getElementById('tests-taken');
-            const averageScoreElement = document.getElementById('average-score');
-            const lastResultElement = document.getElementById('last-result');
-            
-            if (testsTakenElement) testsTakenElement.textContent = data.tests.length;
-            if (averageScoreElement) {
-                const totalScore = data.tests.reduce((sum, test) => sum + test.score, 0);
-                averageScoreElement.textContent = (totalScore / data.tests.length).toFixed(1);
-            }
-            if (lastResultElement) {
-                lastResultElement.textContent = `${data.tests[0].score.toFixed(1)}/5`;
-            }
+        if (testsTakenElement) testsTakenElement.textContent = existingData.length;
+        if (averageScoreElement && existingData.length > 0) {
+            const totalScore = existingData.reduce((sum, test) => sum + test.score, 0);
+            averageScoreElement.textContent = (totalScore / existingData.length).toFixed(1);
         }
-    } catch (error) {
-        console.error('Ошибка загрузки истории:', error);
+        if (lastResultElement && existingData.length > 0) {
+            lastResultElement.textContent = `${existingData[existingData.length - 1].score.toFixed(1)}/5`;
+        }
     }
 }
-
-// Обновленная функция для предложения углубленного теста
-function showDeepTestOffer(score) {
-    setTimeout(() => {
-        const offerHtml = `
-            <div class="deep-test-offer">
-                <div class="offer-content">
-                    <h3>🎯 Хотите получить более точные рекомендации?</h3>
-                    <p>Ваш результат (${score.toFixed(1)}/5) показывает, что есть области для улучшения.</p>
-                    <p>Пройдите углубленный тест по конкретной сфере жизни для персонализированного плана действий.</p>
-                    <div class="offer-buttons">
-                        <a href="deep-test.html" class="btn-offer-primary">Пройти углубленный тест</a>
-                        <button class="btn-offer-secondary" id="close-offer">Спасибо, позже</button>
-                    </div>
-                </div>
-            </div>
-        `;
-        
-        const offerElement = document.createElement('div');
-        offerElement.innerHTML = offerHtml;
-        document.querySelector('.quiz-container')?.appendChild(offerElement);
-        
-        // Добавляем стили
-        if (!document.querySelector('#deep-test-styles')) {
-            const style = document.createElement('style');
-            style.id = 'deep-test-styles';
-            style.textContent = `
-                .deep-test-offer {
-                    margin-top: 30px;
-                    padding: 20px;
-                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                    border-radius: 15px;
-                    color: white;
-                    animation: slideIn 0.5s ease-out;
-                }
-                @keyframes slideIn {
-                    from { transform: translateY(20px); opacity: 0; }
-                    to { transform: translateY(0); opacity: 1; }
-                }
-                .offer-buttons {
-                    display: flex;
-                    gap: 15px;
-                    margin-top: 20px;
-                }
-                .btn-offer-primary {
-                    padding: 12px 24px;
-                    background: white;
-                    color: #667eea;
-                    border: none;
-                    border-radius: 8px;
-                    font-weight: bold;
-                    cursor: pointer;
-                    transition: transform 0.3s;
-                    text-decoration: none;
-                    display: inline-block;
-                    text-align: center;
-                }
-                .btn-offer-primary:hover {
-                    transform: translateY(-2px);
-                    text-decoration: none;
-                }
-                .btn-offer-secondary {
-                    padding: 12px 24px;
-                    background: transparent;
-                    color: white;
-                    border: 2px solid white;
-                    border-radius: 8px;
-                    cursor: pointer;
-                    transition: background 0.3s;
-                }
-                .btn-offer-secondary:hover {
-                    background: rgba(255, 255, 255, 0.1);
-                }
-                @media (max-width: 768px) {
-                    .offer-buttons {
-                        flex-direction: column;
-                    }
-                }
-            `;
-            document.head.appendChild(style);
-        }
-        
-        // Обработчики событий
-        document.getElementById('close-offer')?.addEventListener('click', () => {
-            offerElement.remove();
-        });
-    }, 1000);
-}
-
-// Экспортируем функцию для глобального доступа
-window.initializeQuiz = function() {
-    // Ваша существующая инициализация quiz
-    submitBtn.disabled = true;
-    submitBtn.style.opacity = '0.6';
-    loadTestHistory();
-};
-
-window.showDeepTestOffer = showDeepTestOffer;
-

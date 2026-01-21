@@ -1,97 +1,49 @@
-// Обновленная функция для предложения углубленного теста
-function showDeepTestOffer(score) {
-    setTimeout(() => {
-        const offerHtml = `
-            <div class="deep-test-offer">
-                <div class="offer-content">
-                    <h3>🎯 Хотите получить более точные рекомендации?</h3>
-                    <p>Ваш результат (${score.toFixed(1)}/5) показывает, что есть области для улучшения.</p>
-                    <p>Пройдите углубленный тест по конкретной сфере жизни для персонализированного плана действий.</p>
-                    <div class="offer-buttons">
-                        <a href="deep-test.html" class="btn-offer-primary">Пройти углубленный тест</a>
-                        <button class="btn-offer-secondary" id="close-offer">Спасибо, позже</button>
-                    </div>
-                </div>
-            </div>
-        `;
-        
-        const offerElement = document.createElement('div');
-        offerElement.innerHTML = offerHtml;
-        document.querySelector('.quiz-container')?.appendChild(offerElement);
-        
-        // Добавляем стили
-        if (!document.querySelector('#deep-test-styles')) {
-            const style = document.createElement('style');
-            style.id = 'deep-test-styles';
-            style.textContent = `
-                .deep-test-offer {
-                    margin-top: 30px;
-                    padding: 20px;
-                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                    border-radius: 15px;
-                    color: white;
-                    animation: slideIn 0.5s ease-out;
-                }
-                @keyframes slideIn {
-                    from { transform: translateY(20px); opacity: 0; }
-                    to { transform: translateY(0); opacity: 1; }
-                }
-                .offer-buttons {
-                    display: flex;
-                    gap: 15px;
-                    margin-top: 20px;
-                }
-                .btn-offer-primary {
-                    padding: 12px 24px;
-                    background: white;
-                    color: #667eea;
-                    border: none;
-                    border-radius: 8px;
-                    font-weight: bold;
-                    cursor: pointer;
-                    transition: transform 0.3s;
-                    text-decoration: none;
-                    display: inline-block;
-                    text-align: center;
-                }
-                .btn-offer-primary:hover {
-                    transform: translateY(-2px);
-                    text-decoration: none;
-                }
-                .btn-offer-secondary {
-                    padding: 12px 24px;
-                    background: transparent;
-                    color: white;
-                    border: 2px solid white;
-                    border-radius: 8px;
-                    cursor: pointer;
-                    transition: background 0.3s;
-                }
-                .btn-offer-secondary:hover {
-                    background: rgba(255, 255, 255, 0.1);
-                }
-                @media (max-width: 768px) {
-                    .offer-buttons {
-                        flex-direction: column;
-                    }
-                }
-            `;
-            document.head.appendChild(style);
+{
+  "rewrites": [
+    {
+      "source": "/",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/deep-test",
+      "destination": "/deep-test.html"
+    },
+    {
+      "source": "/journal",
+      "destination": "/journal.html"
+    },
+    {
+      "source": "/tests",
+      "destination": "/tests.html"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/(.*).html",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=0, must-revalidate"
         }
-        
-        // Обработчики событий
-        document.getElementById('close-offer')?.addEventListener('click', () => {
-            offerElement.remove();
-        });
-    }, 1000);
+      ]
+    },
+    {
+      "source": "/css/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    },
+    {
+      "source": "/js/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    }
+  ]
 }
-
-// Экспортируем функцию для глобального доступа
-window.initializeQuiz = function() {
-    // Ваша существующая инициализация quiz
-    submitBtn.disabled = true;
-    submitBtn.style.opacity = '0.6';
-    loadTestHistory();
-};
-
-window.showDeepTestOffer = showDeepTestOffer;

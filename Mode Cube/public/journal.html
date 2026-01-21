@@ -85,122 +85,6 @@
     border-color: rgba(100, 150, 255, 0.5);
 }
 
-/* детальная форма */
-.form-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 25px;
-    margin: 25px 0;
-}
-
-.form-group {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-.form-group.full-width {
-    grid-column: 1 / -1;
-}
-
-.form-group label {
-    font-weight: 600;
-    color: #a0e0ff;
-    font-size: 1.1rem;
-}
-
-.form-group input[type="range"] {
-    width: 100%;
-    height: 8px;
-    border-radius: 4px;
-    background: rgba(255, 255, 255, 0.1);
-    outline: none;
-    -webkit-appearance: none;
-}
-
-.form-group input[type="range"]::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    width: 24px;
-    height: 24px;
-    border-radius: 50%;
-    background: #00dbde;
-    cursor: pointer;
-}
-
-.slider-labels {
-    display: flex;
-    justify-content: space-between;
-    font-size: 1.5rem;
-    margin-top: 5px;
-}
-
-.slider-value {
-    text-align: center;
-    font-weight: bold;
-    font-size: 1.2rem;
-    color: #00dbde;
-    margin-top: 10px;
-}
-
-.activities-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-    gap: 15px;
-    margin-top: 10px;
-}
-
-.activities-grid label {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 10px;
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 10px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.activities-grid label:hover {
-    background: rgba(255, 255, 255, 0.1);
-}
-
-.activities-grid input[type="checkbox"] {
-    width: 18px;
-    height: 18px;
-}
-
-.form-buttons {
-    display: flex;
-    gap: 15px;
-    margin-top: 30px;
-}
-
-.btn-primary, .btn-secondary {
-    padding: 14px 28px;
-    border-radius: 10px;
-    border: none;
-    font-size: 1.05rem;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    flex: 1;
-}
-
-.btn-primary {
-    background: linear-gradient(90deg, #00dbde, #fc00ff);
-    color: white;
-}
-
-.btn-secondary {
-    background: rgba(255, 255, 255, 0.1);
-    color: white;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-.btn-primary:hover, .btn-secondary:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-}
-
 /* переключатель форм */
 .entry-toggle {
     text-align: center;
@@ -663,16 +547,6 @@ class MoodJournal {
         this.elements.quickTags.forEach(tag => {
             tag.addEventListener('click', (e) => this.toggleTag(e.target));
         });
-
-        // Детальная форма
-        this.elements.moodSlider.addEventListener('input', (e) => {
-            this.elements.moodValue.textContent = e.target.value;
-        });
-        this.elements.saveDetailedBtn.addEventListener('click', () => this.saveDetailedEntry());
-        this.elements.cancelDetailedBtn.addEventListener('click', () => this.toggleForm());
-
-        // Переключение форм
-        this.elements.toggleDetailBtn.addEventListener('click', () => this.toggleForm());
 
         // Фильтры
         this.elements.timeFilter.addEventListener('change', (e) => {
@@ -1284,28 +1158,6 @@ class MoodJournal {
         this.showNotification('Детальная запись сохранена!', 'success');
     }
 
-    // Переключить между быстрой и детальной формой
-    toggleForm() {
-        const isDetailedVisible = this.elements.detailedForm.style.display !== 'none';
-        
-        if (isDetailedVisible) {
-            this.elements.detailedForm.style.display = 'none';
-            this.elements.toggleDetailBtn.textContent = '📋 Перейти к детальной записи';
-        } else {
-            this.elements.detailedForm.style.display = 'block';
-            this.elements.toggleDetailBtn.textContent = '📝 Вернуться к быстрой записи';
-            
-            // Сброс детальной формы
-            this.elements.moodSlider.value = 3;
-            this.elements.moodValue.textContent = '3.0';
-            this.elements.energySlider.value = 3;
-            this.elements.stressSlider.value = 3;
-            this.elements.sleepHours.value = 7.5;
-            this.elements.detailedNotes.value = '';
-            this.elements.activityCheckboxes.forEach(cb => cb.checked = false);
-        }
-    }
-
     // Выбрать настроение в быстрой форме
     selectMoodOption(element) {
         document.querySelectorAll('.mood-option').forEach(opt => {
@@ -1491,73 +1343,10 @@ function saveTestToJournal(score, moodText, answers) {
                     <span class="tag" data-tag="хобби">🎨 Хобби</span>
                     <span class="tag" data-tag="спорт">🏃 Спорт</span>
                     <span class="tag" data-tag="отдых">😴 Отдых</span>
+                    <span class="tag" data-tag="отношения">💘 Отношения</span>
                 </div>
                 <button id="save-quick-entry" class="submit-btn">Сохранить запись</button>
             </div>
-
-            <!-- детальная запись (скрыта по умолчанию) -->
-            <div class="detailed-entry card" id="detailed-form" style="display: none;">
-                <h3>📋 Детальная запись</h3>
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label>Дата и время</label>
-                        <input type="datetime-local" id="entry-datetime" value="">
-                    </div>
-                    <div class="form-group">
-                        <label>Настроение (1-5)</label>
-                        <input type="range" id="mood-slider" min="1" max="5" step="0.5" value="3">
-                        <div class="slider-labels">
-                            <span>😢</span>
-                            <span>😔</span>
-                            <span>😐</span>
-                            <span>😊</span>
-                            <span>😄</span>
-                        </div>
-                        <div class="slider-value" id="mood-value">3.0</div>
-                    </div>
-                    <div class="form-group">
-                        <label>Энергия</label>
-                        <input type="range" id="energy-slider" min="1" max="5" step="1" value="3">
-                        <div class="slider-value">3/5</div>
-                    </div>
-                    <div class="form-group">
-                        <label>Стресс</label>
-                        <input type="range" id="stress-slider" min="1" max="5" step="1" value="3">
-                        <div class="slider-value">3/5</div>
-                    </div>
-                    <div class="form-group">
-                        <label>Сон (часы)</label>
-                        <input type="number" id="sleep-hours" min="0" max="24" step="0.5" value="7.5">
-                    </div>
-                    <div class="form-group full-width">
-                        <label>Заметки</label>
-                        <textarea id="detailed-notes" placeholder="Опишите ваш день, мысли, события..." rows="5"></textarea>
-                    </div>
-                    <div class="form-group full-width">
-                        <label>Активности (выберите несколько)</label>
-                        <div class="activities-grid">
-                            <label><input type="checkbox" name="activity" value="работа"> 💼 Работа</label>
-                            <label><input type="checkbox" name="activity" value="учеба"> 📚 Учеба</label>
-                            <label><input type="checkbox" name="activity" value="спорт"> 💘 Отношения</label>
-                            <label><input type="checkbox" name="activity" value="творчество"> 🎨 Творчество</label>
-                            <label><input type="checkbox" name="activity" value="общение"> 👥 Общение</label>
-                            <label><input type="checkbox" name="activity" value="отдых"> 😴 Отдых</label>
-                            <label><input type="checkbox" name="activity" value="прогулка"> 🌳 Прогулка</label>
-                            <label><input type="checkbox" name="activity" value="уборка"> 🧹 Уборка</label>
-                        </div>
-                    </div>
-                </div>
-                <div class="form-buttons">
-                    <button id="save-detailed-entry" class="btn-primary">Сохранить</button>
-                    <button id="cancel-detailed" class="btn-secondary">Отмена</button>
-                </div>
-            </div>
-
-            <!-- переключатель между быстрой и детальной формой -->
-            <div class="entry-toggle">
-                <button id="toggle-detail-btn" class="nav-btn">📋 Перейти к детальной записи</button>
-            </div>
-
             <!-- фильтры и статистика -->
             <div class="journal-controls">
                 <div class="filters">

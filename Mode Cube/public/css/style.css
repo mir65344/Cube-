@@ -601,3 +601,279 @@ h3 {
         min-height: 44px; /* для удобного нажатия */
     }
 }
+
+/* === НОВЫЕ СТИЛИ ДЛЯ РАСШИРЕННОЙ СИСТЕМЫ === */
+
+/* Оверлей и модальные окна */
+.test-offer-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    backdrop-filter: blur(5px);
+}
+
+.test-offer-modal {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    padding: 40px;
+    border-radius: 20px;
+    max-width: 500px;
+    width: 90%;
+    border: 2px solid rgba(0, 219, 222, 0.3);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+}
+
+.offer-buttons {
+    display: flex;
+    gap: 15px;
+    margin-top: 30px;
+}
+
+.btn-primary, .btn-secondary {
+    padding: 12px 24px;
+    border-radius: 10px;
+    border: none;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-primary {
+    background: linear-gradient(90deg, #00dbde, #fc00ff);
+    color: white;
+}
+
+.btn-secondary {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.btn-primary:hover, .btn-secondary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+/* Стили для углубленного теста */
+.deep-test-offer {
+    margin-top: 30px;
+    padding: 25px;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.9), rgba(118, 75, 162, 0.9));
+    border-radius: 15px;
+    color: white;
+    animation: slideIn 0.5s ease-out;
+    backdrop-filter: blur(10px);
+}
+
+@keyframes slideIn {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+/* Адаптивные стили для мобильных устройств */
+@media (max-width: 768px) {
+    .test-offer-modal {
+        padding: 25px;
+        margin: 20px;
+    }
+    
+    .offer-buttons {
+        flex-direction: column;
+    }
+    
+    .btn-primary, .btn-secondary {
+        width: 100%;
+        text-align: center;
+    }
+    
+    /* Улучшаем отображение графика */
+    .chart-container {
+        padding: 15px;
+    }
+    
+    /* Улучшаем отображение категорий */
+    .categories-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+    
+    .category-card {
+        padding: 20px;
+    }
+    
+    /* Улучшаем навигацию */
+    .page-nav {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    
+    .nav-btn {
+        padding: 10px 15px;
+        font-size: 0.9rem;
+    }
+}
+
+/* Стили для дневника */
+.journal-entry {
+    animation: fadeIn 0.5s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Стили для инсайтов */
+.insight {
+    display: flex;
+    align-items: flex-start;
+    gap: 15px;
+    padding: 15px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+    margin-bottom: 10px;
+}
+
+.insight.positive {
+    border-left: 4px solid #2ed573;
+}
+
+.insight.warning {
+    border-left: 4px solid #ffa502;
+}
+
+.insight.info {
+    border-left: 4px solid #1e90ff;
+}
+
+.insight-icon {
+    font-size: 1.5rem;
+}
+
+.insight-text {
+    flex: 1;
+    line-height: 1.5;
+}
+
+/* Анимация загрузки */
+.loading-state {
+    text-align: center;
+    padding: 40px;
+    color: #a0a0c0;
+}
+
+.loading-state::after {
+    content: '';
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 2px solid #a0a0c0;
+    border-top-color: transparent;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-left: 10px;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Стили для тегов */
+.tag {
+    padding: 3px 10px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    font-size: 0.8rem;
+    color: #a0a0c0;
+}
+
+/* Стили для формы */
+textarea {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+    padding: 15px;
+    color: white;
+    font-family: inherit;
+    resize: vertical;
+    min-height: 100px;
+}
+
+textarea:focus {
+    outline: none;
+    border-color: #00dbde;
+}
+
+/* Стили для статистики */
+.trend-indicator {
+    font-size: 0.9rem;
+    padding: 5px 10px;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.05);
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+/* Адаптация для печати */
+@media print {
+    .page-nav, .controls, button, .submit-btn {
+        display: none !important;
+    }
+    
+    body {
+        background: white !important;
+        color: black !important;
+    }
+    
+    .quiz-container, .user-stats, .journal-entry {
+        box-shadow: none !important;
+        border: 1px solid #ddd !important;
+    }
+}
+
+/* Высококонтрастный режим для доступности */
+@media (prefers-contrast: high) {
+    body {
+        background: #000 !important;
+        color: #fff !important;
+    }
+    
+    .option, button, .nav-btn {
+        border: 2px solid #fff !important;
+    }
+    
+    .option.selected {
+        background: #00f !important;
+        color: #fff !important;
+    }
+}
+
+/* Поддержка темной темы по умолчанию */
+@media (prefers-color-scheme: light) {
+    body {
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        color: #333;
+    }
+    
+    .quiz-container, .user-stats, .category-card {
+        background: rgba(255, 255, 255, 0.9);
+        color: #333;
+    }
+    
+    .option {
+        background: rgba(0, 0, 0, 0.05);
+        color: #333;
+    }
+    
+    .option:hover {
+        background: rgba(0, 0, 0, 0.1);
+    }
+}

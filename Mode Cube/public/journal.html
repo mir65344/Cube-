@@ -1456,6 +1456,214 @@ function saveTestToJournal(score, moodText, answers) {
         window.moodJournal.showNotification('Результат теста сохранён в дневник!', 'success');
     }
 }
+
+    /**
+     * ДЕТАЛЬНАЯ ФОРМА И ПОЛЗУНКИ
+     */
+    
+    setupDetailedForm() {
+        // Находим элементы детальной формы
+        const moodSlider = document.getElementById('mood-slider');
+        const moodValue = document.getElementById('mood-value');
+        const energySlider = document.getElementById('energy-slider');
+        const energyValue = document.querySelector('#energy-slider + .slider-value');
+        const stressSlider = document.getElementById('stress-slider');
+        const stressValue = document.querySelector('#stress-slider + .slider-value');
+        const toggleBtn = document.getElementById('toggle-detail-btn');
+        const detailedForm = document.getElementById('detailed-form');
+        const saveDetailedBtn = document.getElementById('save-detailed-entry');
+        const cancelBtn = document.getElementById('cancel-detailed');
+        
+        // Если элементов нет - выходим
+        if (!moodSlider || !toggleBtn) return;
+        
+        // Обновляем значения ползунков
+        const updateSliderValues = () => {
+            if (moodValue) moodValue.textContent = moodSlider.value;
+            if (energyValue) energyValue.textContent = energySlider.value + '/5';
+            if (stressValue) stressValue.textContent = stressSlider.value + '/5';
+        };
+        
+        // Обработчики для ползунков
+        moodSlider.addEventListener('input', updateSliderValues);
+        if (energySlider) energySlider.addEventListener('input', updateSliderValues);
+        if (stressSlider) stressSlider.addEventListener('input', updateSliderValues);
+        
+        // Кнопка переключения формы
+        toggleBtn.addEventListener('click', () => {
+            const isVisible = detailedForm.style.display !== 'none';
+            if (isVisible) {
+                detailedForm.style.display = 'none';
+                toggleBtn.textContent = '📋 Перейти к детальной записи';
+            } else {
+                detailedForm.style.display = 'block';
+                toggleBtn.textContent = '📝 Вернуться к быстрой записи';
+            }
+        });
+        
+        // Кнопка отмены
+        if (cancelBtn) {
+            cancelBtn.addEventListener('click', () => {
+                detailedForm.style.display = 'none';
+                toggleBtn.textContent = '📋 Перейти к детальной записи';
+            });
+        }
+        
+        // Сохранение детальной записи
+        if (saveDetailedBtn) {
+            saveDetailedBtn.addEventListener('click', () => this.saveDetailedEntry());
+        }
+        
+        // Устанавливаем текущую дату/время
+        const datetimeInput = document.getElementById('entry-datetime');
+        if (datetimeInput) {
+            const now = new Date();
+            // Форматируем для input[type="datetime-local"]
+            const localDateTime = now.toISOString().slice(0, 16);
+            datetimeInput.value = localDateTime;
+        }
+        
+        // Инициализируем значения
+        updateSliderValues();
+    }
+    
+    /**
+     * СОХРАНЕНИЕ ДЕТАЛЬНОЙ ЗАПИСИ
+     */
+    saveDetailedEntry() {
+        // Собираем данные из формы
+        const mood = parseFloat(document.getElementById('mood-slider').value);
+        const energy = parseInt(document.getElementById('energy-slider').value);
+        const stress = parseInt(document.getElementById('stress-slider').value);
+        const sleepHours = parseFloat(document.getElementById('sleep-hours').value) || null;
+        const notes = document.getElementById('detailed-notes').value.trim();
+        const datetime = document.getElementById('entry-datetime').value;
+        
+        // Собираем активности
+        const activities = [];
+        document.querySelectorAll('input[name="activity"]:checked').forEach(cb => {
+            activities.push(cb.value);
+        });
+        
+        // Проверяем обязательные поля
+        if (isNaN(mood)) {
+            this.showNotification('Пожалуйста, выберите настроение', 'error');
+            return;
+        }
+        
+        // Создаем запись
+        const entry = {
+            id: Date.now(),
+            date: datetime ? new Date(datetime).toISOString() : new Date().toISOString(),
+            mood: mood,
+            moodText: this.getMoodText(mood),
+            energy: energy,
+            stress: stress,
+            sleepHours: sleepHours,
+            notes: notes,
+            activities: activities,
+            tags: [], // В детальной форме нет тегов
+            isDetailed: true,
+            createdAt: new Date().toISOString()
+        };
+        
+        // Сохраняем
+        this.addEntry(entry);
+        
+        // Сбрасываем форму
+        this.resetDetailedForm();
+        
+        // Скрываем форму
+        document.getElementById('detailed-form').style.display = 'none';
+        document.getElementById('toggle-detail-btn').textContent = '📋 Перейти к детальной записи';
+        
+        this.showNotification('Детальная запись сохранена!', 'success');
+    }
+    
+    /**
+     * СБРОС ДЕТАЛЬНОЙ ФОРМЫ
+     */
+    resetDetailedForm() {
+        document.getElementById('mood-slider').value = 3;
+        document.getElementById('energy-slider').value = 3;
+        document.getElementById('stress-slider').value = 3;
+        document.getElementById('sleep-hours').value = 7.5;
+        document.getElementById('detailed-notes').value = '';
+        
+        // Сбрасываем чекбоксы активностей
+        document.querySelectorAll('input[name="activity"]').forEach(cb => {
+            cb.checked = false;
+        });
+        
+        // Обновляем отображаемые значения
+        if (document.getElementById('mood-value')) {
+            document.getElementById('mood-value').textContent = '3.0';
+        }
+        
+        const now = new Date();
+        const datetimeInput = document.getElementById('entry-datetime');
+        if (datetimeInput) {
+            const localDateTime = now.toISOString().slice(0, 16);
+            datetimeInput.value = localDateTime;
+        }
+    }
+    
+    /**
+     * ПОКАЗАТЬ УВЕДОМЛЕНИЕ (улучшенная версия)
+     */
+    showNotification(message, type = 'success') {
+        // Удаляем старое уведомление
+        const oldNotification = document.querySelector('.notification');
+        if (oldNotification) oldNotification.remove();
+        
+        // Создаем новое
+        const notification = document.createElement('div');
+        notification.className = `notification ${type}`;
+        notification.innerHTML = `
+            <div class="notification-content">
+                <span class="notification-icon">
+                    ${type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️'}
+                </span>
+                <span class="notification-text">${message}</span>
+            </div>
+        `;
+        
+        // Стили
+        notification.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: ${type === 'success' ? '#4CAF50' : type === 'error' ? '#F44336' : '#2196F3'};
+            color: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            z-index: 10000;
+            animation: slideInRight 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            min-width: 250px;
+            max-width: 350px;
+        `;
+        
+        document.body.appendChild(notification);
+        
+        // Автоматическое скрытие
+        setTimeout(() => {
+            notification.style.animation = 'slideOutRight 0.3s ease';
+            setTimeout(() => notification.remove(), 300);
+        }, 3000);
+    }
+
+    /**
+     * ОБНОВЛЕННЫЙ ИНИЦИАЛИЗАТОР
+     */
+    init() {
+        console.log('Дневник инициализирован');
+        this.setupEventListeners();
+        this.setupDetailedForm(); // ← ДОБАВИЛИ ЭТУ СТРОЧКУ!
+        this.loadEntries();
+        this.displayStats();
+    }
+        
     </script>
 </head>
 <body>

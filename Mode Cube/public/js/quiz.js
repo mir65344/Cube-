@@ -123,6 +123,28 @@ function showResult(score, moodLevel) {
     showRecommendations(moodLevel);
 }
 
+// Добавить кнопку сохранения в дневник
+const saveToJournalBtn = document.createElement('button');
+saveToJournalBtn.textContent = '💾 Сохранить в дневник';
+saveToJournalBtn.className = 'submit-btn';
+saveToJournalBtn.style.marginTop = '10px';
+saveToJournalBtn.style.backgroundColor = '#4CAF50';
+
+saveToJournalBtn.addEventListener('click', () => {
+    // Проверяем, есть ли функция сохранения в дневник
+    if (typeof saveTestToJournal === 'function') {
+        saveTestToJournal(score, getMoodText(moodLevel), userAnswers);
+        saveToJournalBtn.disabled = true;
+        saveToJournalBtn.textContent = '✅ Сохранено в дневник';
+        saveToJournalBtn.style.backgroundColor = '#666';
+    } else {
+        alert('Функция дневника недоступна. Перейдите на страницу дневника.');
+    }
+});
+
+// Вставляем кнопку после рекомендаций
+recommendationsDiv.parentNode.insertBefore(saveToJournalBtn, recommendationsDiv.nextSibling);
+
 // получить текстовое описание настроения
 function getMoodText(moodLevel) {
     if (moodLevel >= 4.5) return 'Отличное 🌟';
@@ -281,3 +303,4 @@ function loadTestHistory() {
         }
     }
 }
+

@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Дневник настроения - Mood Cube</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📖 Дневник настроения</h1>
+            <p class="subtitle">Отслеживайте ваше эмоциональное состояние, находите закономерности и улучшайте самочувствие</p>
+        </header>
+
+        <nav class="page-nav">
+            <a href="index.html" class="nav-btn">Главная</a>
+            <a href="tests.html" class="nav-btn">Тесты EQ</a>
+            <a href="journal.html" class="nav-btn active">Дневник</a>
+        </nav>
+
+        <!-- основной контейнер дневника -->
+        <div class="journal-container">
+            <!-- быстрая запись -->
+            <div class="quick-entry card">
+                <h3>📝 Быстрая запись</h3>
+                <div class="mood-selector">
+                    <div class="mood-option" data-value="1">😢</div>
+                    <div class="mood-option" data-value="2">😔</div>
+                    <div class="mood-option" data-value="3" data-default>😐</div>
+                    <div class="mood-option" data-value="4">😊</div>
+                    <div class="mood-option" data-value="5">😄</div>
+                </div>
+                <textarea id="quick-note" placeholder="Опишите, что повлияло на ваше настроение сегодня... (необязательно)" rows="3"></textarea>
+                <div class="quick-tags">
+                    <span class="tag" data-tag="работа">💼 Работа</span>
+                    <span class="tag" data-tag="семья">👨‍👩‍👧 Семья</span>
+                    <span class="tag" data-tag="друзья">👫 Друзья</span>
+                    <span class="tag" data-tag="хобби">🎨 Хобби</span>
+                    <span class="tag" data-tag="спорт">🏃 Спорт</span>
+                    <span class="tag" data-tag="отдых">😴 Отдых</span>
+                </div>
+                <button id="save-quick-entry" class="submit-btn">Сохранить запись</button>
+            </div>
+
+            <!-- детальная запись (скрыта по умолчанию) -->
+            <div class="detailed-entry card" id="detailed-form" style="display: none;">
+                <h3>📋 Детальная запись</h3>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Дата и время</label>
+                        <input type="datetime-local" id="entry-datetime" value="">
+                    </div>
+                    <div class="form-group">
+                        <label>Настроение (1-5)</label>
+                        <input type="range" id="mood-slider" min="1" max="5" step="0.5" value="3">
+                        <div class="slider-labels">
+                            <span>😢</span>
+                            <span>😔</span>
+                            <span>😐</span>
+                            <span>😊</span>
+                            <span>😄</span>
+                        </div>
+                        <div class="slider-value" id="mood-value">3.0</div>
+                    </div>
+                    <div class="form-group">
+                        <label>Энергия</label>
+                        <input type="range" id="energy-slider" min="1" max="5" step="1" value="3">
+                        <div class="slider-value">3/5</div>
+                    </div>
+                    <div class="form-group">
+                        <label>Стресс</label>
+                        <input type="range" id="stress-slider" min="1" max="5" step="1" value="3">
+                        <div class="slider-value">3/5</div>
+                    </div>
+                    <div class="form-group">
+                        <label>Сон (часы)</label>
+                        <input type="number" id="sleep-hours" min="0" max="24" step="0.5" value="7.5">
+                    </div>
+                    <div class="form-group full-width">
+                        <label>Заметки</label>
+                        <textarea id="detailed-notes" placeholder="Опишите ваш день, мысли, события..." rows="5"></textarea>
+                    </div>
+                    <div class="form-group full-width">
+                        <label>Активности (выберите несколько)</label>
+                        <div class="activities-grid">
+                            <label><input type="checkbox" name="activity" value="работа"> 💼 Работа</label>
+                            <label><input type="checkbox" name="activity" value="учеба"> 📚 Учеба</label>
+                            <label><input type="checkbox" name="activity" value="спорт"> 🏃 Спорт</label>
+                            <label><input type="checkbox" name="activity" value="творчество"> 🎨 Творчество</label>
+                            <label><input type="checkbox" name="activity" value="общение"> 👥 Общение</label>
+                            <label><input type="checkbox" name="activity" value="отдых"> 😴 Отдых</label>
+                            <label><input type="checkbox" name="activity" value="прогулка"> 🌳 Прогулка</label>
+                            <label><input type="checkbox" name="activity" value="уборка"> 🧹 Уборка</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-buttons">
+                    <button id="save-detailed-entry" class="btn-primary">Сохранить</button>
+                    <button id="cancel-detailed" class="btn-secondary">Отмена</button>
+                </div>
+            </div>
+
+            <!-- переключатель между быстрой и детальной формой -->
+            <div class="entry-toggle">
+                <button id="toggle-detail-btn" class="nav-btn">📋 Перейти к детальной записи</button>
+            </div>
+
+            <!-- фильтры и статистика -->
+            <div class="journal-controls">
+                <div class="filters">
+                    <select id="time-filter">
+                        <option value="all">Все записи</option>
+                        <option value="today">Сегодня</option>
+                        <option value="week">Эта неделя</option>
+                        <option value="month">Этот месяц</option>
+                        <option value="last7">Последние 7 дней</option>
+                        <option value="last30">Последние 30 дней</option>
+                    </select>
+                    <select id="mood-filter">
+                        <option value="all">Все настроения</option>
+                        <option value="1">😢 Очень плохое</option>
+                        <option value="2">😔 Плохое</option>
+                        <option value="3">😐 Нормальное</option>
+                        <option value="4">😊 Хорошее</option>
+                        <option value="5">😄 Отличное</option>
+                    </select>
+                    <button id="export-btn" class="nav-btn">📤 Экспорт данных</button>
+                </div>
+
+                <div class="stats-overview">
+                    <div class="stat-card">
+                        <div class="stat-label">Всего записей</div>
+                        <div class="stat-value" id="total-entries">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Среднее настроение</div>
+                        <div class="stat-value" id="avg-mood">-</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Лучший день</div>
+                        <div class="stat-value" id="best-day">-</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Текущая серия</div>
+                        <div class="stat-value" id="current-streak">0 дней</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- список записей -->
+            <div class="entries-list" id="entries-list">
+                <h3>📅 История записей</h3>
+                <div class="no-entries" id="no-entries">
+                    <p>Пока нет записей. Добавьте первую!</p>
+                </div>
+                <!-- записи будут добавляться сюда через JavaScript -->
+            </div>
+
+            <!-- График настроения -->
+            <div class="mood-chart card">
+                <h3>📈 График настроения</h3>
+                <div class="chart-container">
+                    <canvas id="moodChart"></canvas>
+                </div>
+                <div class="chart-controls">
+                    <button class="nav-btn" data-period="7">7 дней</button>
+                    <button class="nav-btn" data-period="30">30 дней</button>
+                    <button class="nav-btn" data-period="90">90 дней</button>
+                    <button class="nav-btn active" data-period="all">Все время</button>
+                </div>
+            </div>
+
+            <!-- аналитика и инсайты -->
+            <div class="insights card">
+                <h3>💡 Инсайты и закономерности</h3>
+                <div class="insights-list" id="insights-list">
+                    <!-- инсайты будут генерироваться автоматически -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- подключаем библиотеку Chart.js для графиков -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="js/journal.js"></script>
+</body>
+</html>

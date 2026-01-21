@@ -268,85 +268,6 @@ function updateStats(score, moodLevel) {
     }
 }
 
-// Предложение углубленного теста
-function showDeepTestOffer(score) {
-    setTimeout(() => {
-        const offerHtml = `
-            <div class="deep-test-offer">
-                <div class="offer-content">
-                    <h3>🎯 Хотите получить более точные рекомендации?</h3>
-                    <p>Ваш результат (${score.toFixed(1)}/5) показывает, что есть области для улучшения.</p>
-                    <p>Пройдите углубленный тест по конкретной сфере жизни для персонализированного плана действий.</p>
-                    <div class="offer-buttons">
-                        <button class="btn-offer-primary" id="go-to-deep-test">Пройти углубленный тест</button>
-                        <button class="btn-offer-secondary" id="close-offer">Спасибо, позже</button>
-                    </div>
-                </div>
-            </div>
-        `;
-        
-        const offerElement = document.createElement('div');
-        offerElement.innerHTML = offerHtml;
-        document.querySelector('.quiz-container').appendChild(offerElement);
-        
-        // Добавляем стили
-        const style = document.createElement('style');
-        style.textContent = `
-            .deep-test-offer {
-                margin-top: 30px;
-                padding: 20px;
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                border-radius: 15px;
-                color: white;
-                animation: slideIn 0.5s ease-out;
-            }
-            @keyframes slideIn {
-                from { transform: translateY(20px); opacity: 0; }
-                to { transform: translateY(0); opacity: 1; }
-            }
-            .offer-buttons {
-                display: flex;
-                gap: 15px;
-                margin-top: 20px;
-            }
-            .btn-offer-primary {
-                padding: 12px 24px;
-                background: white;
-                color: #667eea;
-                border: none;
-                border-radius: 8px;
-                font-weight: bold;
-                cursor: pointer;
-                transition: transform 0.3s;
-            }
-            .btn-offer-primary:hover {
-                transform: translateY(-2px);
-            }
-            .btn-offer-secondary {
-                padding: 12px 24px;
-                background: transparent;
-                color: white;
-                border: 2px solid white;
-                border-radius: 8px;
-                cursor: pointer;
-                transition: background 0.3s;
-            }
-            .btn-offer-secondary:hover {
-                background: rgba(255, 255, 255, 0.1);
-            }
-        `;
-        document.head.appendChild(style);
-        
-        // Обработчики событий
-        document.getElementById('go-to-deep-test').addEventListener('click', () => {
-            window.location.href = '/deep-test';
-        });
-        
-        document.getElementById('close-offer').addEventListener('click', () => {
-            offerElement.remove();
-        });
-    }, 1000);
-}
 
 // инициализация при загрузке страницы
 document.addEventListener('DOMContentLoaded', function() {
@@ -477,3 +398,4 @@ window.initializeQuiz = function() {
 };
 
 window.showDeepTestOffer = showDeepTestOffer;
+

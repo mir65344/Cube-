@@ -1,6 +1,6 @@
 /**
- * 🧠 СИСТЕМА ПСИХОЛОГИЧЕСКИХ ТЕСТОВ
- * Включает: EQ, эмпатия, социальный интеллект, самоуспокоение
+ * 🧠 СИСТЕМА ПСИХОЛОГИЧЕСКИХ ТЕСТОВ - ОПТИМИЗИРОВАННАЯ ВЕРСИЯ
+ * Единая база эмоций и действий
  */
 
 class TestSystem {
@@ -11,6 +11,10 @@ class TestSystem {
         this.testInProgress = false;
         this.testCompleted = false;
         
+        // Базы данных
+        this.emotionsDB = this.createEmotionsDatabase();
+        this.actionsDB = this.createActionsDatabase();
+        
         this.init();
     }
 
@@ -18,6 +22,67 @@ class TestSystem {
         this.loadTestStats();
         this.setupEventListeners();
         this.updateTestSelection();
+    }
+
+    createEmotionsDatabase() {
+        return {
+            // Основные эмоции
+            basic: ['радость', 'грусть', 'гнев', 'страх', 'удивление', 'отвращение'],
+            
+            // Сложные чувства
+            complex: ['тревога', 'волнение', 'одиночество', 'обида', 'ревность', 'разочарование'],
+            
+            // Позитивные состояния
+            positive: ['удовлетворение', 'вдохновение', 'гордость', 'благодарность', 'надежда', 'спокойствие'],
+            
+            // Социальные эмоции
+            social: ['доверие', 'недоверие', 'уважение', 'презрение', 'восхищение', 'сочувствие'],
+            
+            // Все эмоции для поиска
+            getAll() {
+                return [...this.basic, ...this.complex, ...this.positive, ...this.social];
+            }
+        };
+    }
+
+    createActionsDatabase() {
+        return {
+            // Дыхательные техники
+            breathing: [
+                'глубокое дыхание',
+                'диафрагмальное дыхание', 
+                'дыхание 4-7-8',
+                'осознанное дыхание'
+            ],
+            
+            // Физические методы
+            physical: [
+                'прогулка на свежем воздухе',
+                'растяжка', 
+                'физические упражнения',
+                'водные процедуры'
+            ],
+            
+            // Когнитивные методы
+            cognitive: [
+                'позитивный внутренний диалог',
+                'переоценка ситуации', 
+                'фокусировка на решениях',
+                'медитация'
+            ],
+            
+            // Социальные методы
+            social: [
+                'разговор с близким',
+                'просьба о помощи', 
+                'совместная деятельность'
+            ],
+            
+            // Все действия для поиска
+            getAll() {
+                return [...this.breathing, ...this.physical, ...this.cognitive, ...this.social];
+            }
+        };
     }
 
     setupEventListeners() {
@@ -33,27 +98,24 @@ class TestSystem {
         });
 
         // Кнопка начала теста
-        document.getElementById('start-test').addEventListener('click', () => {
-            this.startTest();
-        });
+        const startBtn = document.getElementById('start-test');
+        if (startBtn) {
+            startBtn.addEventListener('click', () => this.startTest());
+        }
 
         // Кнопки навигации
-        document.getElementById('prev-question').addEventListener('click', () => {
-            this.prevQuestion();
-        });
-
-        document.getElementById('next-question').addEventListener('click', () => {
-            this.nextQuestion();
-        });
+        const prevBtn = document.getElementById('prev-question');
+        const nextBtn = document.getElementById('next-question');
+        
+        if (prevBtn) prevBtn.addEventListener('click', () => this.prevQuestion());
+        if (nextBtn) nextBtn.addEventListener('click', () => this.nextQuestion());
 
         // Действия с результатами
-        document.getElementById('save-to-journal').addEventListener('click', () => {
-            this.saveResultsToJournal();
-        });
-
-        document.getElementById('retake-test').addEventListener('click', () => {
-            this.retakeTest();
-        });
+        const saveBtn = document.getElementById('save-to-journal');
+        const retakeBtn = document.getElementById('retake-test');
+        
+        if (saveBtn) saveBtn.addEventListener('click', () => this.saveResultsToJournal());
+        if (retakeBtn) retakeBtn.addEventListener('click', () => this.retakeTest());
     }
 
     selectTest(testType) {
@@ -66,7 +128,7 @@ class TestSystem {
         document.getElementById('test-title').textContent = testData.title;
         document.getElementById('test-description').textContent = testData.description;
         document.getElementById('test-time').textContent = testData.time;
-        document.getElementById('test-questions').textContent = testData.questions;
+        document.getElementById('test-questions').textContent = testData.questions.length + ' вопросов';
         document.getElementById('test-parts').textContent = testData.parts;
     }
 
@@ -105,9 +167,12 @@ class TestSystem {
         if (question.type === 'theory') {
             typeIndicator.textContent = '📚 Теоретическая часть';
             typeIndicator.style.background = 'rgba(33, 150, 243, 0.2)';
-        } else {
+        } else if (question.type === 'practice') {
             typeIndicator.textContent = '💡 Практическая часть';
             typeIndicator.style.background = 'rgba(76, 175, 80, 0.2)';
+        } else if (question.type === 'multi') {
+            typeIndicator.textContent = '📝 Множественный выбор';
+            typeIndicator.style.background = 'rgba(255, 152, 0, 0.2)';
         }
 
         // Создаем HTML вопроса
@@ -127,34 +192,27 @@ class TestSystem {
                 `;
             });
             questionHTML += '</div>';
-        } else if (question.type === 'practice') {
-            // Практические вопросы с вводом ответов
+        } 
+        else if (question.type === 'practice') {
+            // Практические вопросы с кнопками эмоций
             questionHTML += `
                 <div class="practice-section">
-                    <!-- Основной ввод -->
-                    <div class="practice-input-container">
-                        <textarea id="practice-input" ...></textarea>
-                        
-                        <!-- Подсказки появляются прямо под textarea -->
-                        <div class="autocomplete-hints" id="autocomplete-hints" style="display: none;">
-                            <p class="hint-title">Возможные варианты:</p>
-                            <div class="hint-list"></div>
-                        </div>
+                    <p class="practice-instruction">${question.instruction || 'Выберите до 6 вариантов:'}</p>
+                    
+                    <!-- Контейнер для эмоций -->
+                    <div class="emotions-grid" id="emotions-grid-${this.currentQuestion}">
+                        ${this.generateEmotionButtons(question.emotions || this.getRandomEmotions(12))}
                     </div>
                     
-                    <!-- Список выбранных вариантов -->
-                    <div class="selected-hints-container">
-                        <div class="selected-hints" id="selected-hints"></div>
-                    </div>
-                    
-                    <!-- Добавление своих вариантов (после выбранных) -->
-                    <div class="custom-hint-container">
-                        <input type="text" id="add-hint-input" placeholder="Добавить свой вариант...">
-                        <button id="add-hint-btn" class="nav-btn">+ Добавить</button>
+                    <!-- Выбранные эмоции -->
+                    <div class="selected-emotions">
+                        <p>Выбрано: <span id="selected-count-${this.currentQuestion}">0</span>/6</p>
+                        <div class="selected-list" id="selected-list-${this.currentQuestion}"></div>
                     </div>
                 </div>
             `;
-        } else if (question.type === 'multi') {
+        }
+        else if (question.type === 'multi') {
             // Вопросы с множественным выбором
             questionHTML += `
                 <p class="multiple-hint">Можно выбрать несколько вариантов</p>
@@ -180,160 +238,123 @@ class TestSystem {
         this.setupQuestionHandlers(question);
 
         // Обновляем кнопку "Назад"
-        document.getElementById('prev-question').style.display = 
-            this.currentQuestion > 0 ? 'block' : 'none';
+        const prevBtn = document.getElementById('prev-question');
+        if (prevBtn) {
+            prevBtn.style.display = this.currentQuestion > 0 ? 'block' : 'none';
+        }
+    }
+
+    generateEmotionButtons(emotions) {
+        return emotions.map(emotion => `
+            <button class="emotion-btn" data-emotion="${emotion}">
+                ${emotion}
+            </button>
+        `).join('');
+    }
+
+    getRandomEmotions(count = 12) {
+        const allEmotions = this.emotionsDB.getAll();
+        return [...allEmotions]
+            .sort(() => Math.random() - 0.5)
+            .slice(0, count);
     }
 
     setupQuestionHandlers(question) {
-        if (question.type === 'theory' || question.type === 'multi') {
+        if (question.type === 'theory') {
             const options = document.querySelectorAll('.option');
             options.forEach(option => {
                 option.addEventListener('click', () => {
                     if (this.testCompleted) return;
-
-                    if (question.type === 'theory') {
-                        // Одиночный выбор
-                        options.forEach(opt => opt.classList.remove('selected'));
-                        option.classList.add('selected');
-                    } else {
-                        // Множественный выбор
-                        option.classList.toggle('selected');
-                        const checkbox = option.querySelector('.checkbox');
-                        if (checkbox) checkbox.classList.toggle('checked');
-                    }
-
-                    // Сохраняем ответ
+                    options.forEach(opt => opt.classList.remove('selected'));
+                    option.classList.add('selected');
                     this.saveAnswer(question.type);
                 });
             });
-        } else if (question.type === 'practice') {
+        } 
+        else if (question.type === 'multi') {
+            const options = document.querySelectorAll('.option');
+            options.forEach(option => {
+                option.addEventListener('click', () => {
+                    if (this.testCompleted) return;
+                    option.classList.toggle('selected');
+                    const checkbox = option.querySelector('.checkbox');
+                    if (checkbox) checkbox.classList.toggle('checked');
+                    this.saveAnswer(question.type);
+                });
+            });
+        }
+        else if (question.type === 'practice') {
             this.setupPracticeHandlers(question);
         }
     }
 
     setupPracticeHandlers(question) {
-        const textarea = document.getElementById('practice-input');
-        const hintsContainer = document.getElementById('autocomplete-hints');
-        const hintList = hintsContainer.querySelector('.hint-list');
-        const selectedContainer = document.getElementById('selected-hints');
-        const addHintInput = document.getElementById('add-hint-input');
-        const addHintBtn = document.getElementById('add-hint-btn');
-
-        // Создаем список возможных ответов
-        const allHints = [...question.correctAnswers, ...question.incorrectAnswers];
-        this.shuffleArray(allHints);
-
-        // Отображаем подсказки
-        hintList.innerHTML = '';
-        allHints.forEach(hint => {
-            const hintElement = document.createElement('div');
-            hintElement.className = 'hint-item';
-            hintElement.textContent = hint;
-            hintElement.addEventListener('click', () => {
-                this.addSelectedHint(hint, question);
-            });
-            hintList.appendChild(hintElement);
-        });
-
-        // Показываем подсказки при фокусе
-        textarea.addEventListener('focus', () => {
-            hintsContainer.style.display = 'block';
-        });
-
-        // Парсинг введенного текста
-        textarea.addEventListener('input', () => {
-            const text = textarea.value.trim();
-            if (text) {
-                // Разбиваем на отдельные ответы
-                const answers = text.split(/[,\n]/)
-                    .map(a => a.trim())
-                    .filter(a => a.length > 0);
+        const containerId = `emotions-grid-${this.currentQuestion}`;
+        const selectedListId = `selected-list-${this.currentQuestion}`;
+        const countId = `selected-count-${this.currentQuestion}`;
+        
+        const emotionBtns = document.querySelectorAll(`#${containerId} .emotion-btn`);
+        const selectedList = document.getElementById(selectedListId);
+        const countElement = document.getElementById(countId);
+        
+        let selectedEmotions = this.userAnswers[this.currentQuestion] || [];
+        
+        // Инициализация выбранных эмоций
+        this.updateSelectedList(selectedEmotions, selectedList, countElement);
+        
+        // Обработчики для кнопок эмоций
+        emotionBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const emotion = btn.dataset.emotion;
                 
-                // Сохраняем ответы
-                this.userAnswers[this.currentQuestion] = answers;
-            }
-        });
-
-        // Кнопка добавления своего варианта
-        addHintBtn.addEventListener('click', () => {
-            const customHint = addHintInput.value.trim();
-            if (customHint && !this.isHintSelected(customHint)) {
-                this.addSelectedHint(customHint, question);
-                addHintInput.value = '';
-            }
-        });
-
-        // Enter для добавления
-        addHintInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                addHintBtn.click();
-            }
-        });
-
-        // Загружаем ранее выбранные ответы
-        if (this.userAnswers[this.currentQuestion]) {
-            this.userAnswers[this.currentQuestion].forEach(answer => {
-                this.addSelectedHint(answer, question);
+                if (selectedEmotions.includes(emotion)) {
+                    // Удаляем если уже выбрана
+                    selectedEmotions = selectedEmotions.filter(e => e !== emotion);
+                    btn.classList.remove('selected');
+                } else {
+                    // Добавляем если есть место
+                    if (selectedEmotions.length < 6) {
+                        selectedEmotions.push(emotion);
+                        btn.classList.add('selected');
+                    } else {
+                        alert('Максимум 6 эмоций');
+                        return;
+                    }
+                }
+                
+                // Сохраняем ответ
+                this.userAnswers[this.currentQuestion] = selectedEmotions;
+                
+                // Обновляем список выбранных
+                this.updateSelectedList(selectedEmotions, selectedList, countElement);
             });
-        }
-    }
-
-    addSelectedHint(hint, question) {
-        const selectedContainer = document.getElementById('selected-hints');
-        
-        // Проверяем, не добавлен ли уже
-        if (this.isHintSelected(hint)) return;
-
-        // Создаем элемент выбранной подсказки
-        const selectedHint = document.createElement('div');
-        selectedHint.className = 'selected-hint';
-        selectedHint.innerHTML = `
-            ${hint}
-            <button class="remove-hint" data-hint="${hint}">×</button>
-        `;
-
-        // Добавляем обработчик удаления
-        selectedHint.querySelector('.remove-hint').addEventListener('click', (e) => {
-            e.stopPropagation();
-            selectedHint.remove();
-            this.removeHintFromAnswers(hint);
         });
-
-        selectedContainer.appendChild(selectedHint);
-
-        // Добавляем в ответы
-        if (!this.userAnswers[this.currentQuestion]) {
-            this.userAnswers[this.currentQuestion] = [];
-        }
-        if (!this.userAnswers[this.currentQuestion].includes(hint)) {
-            this.userAnswers[this.currentQuestion].push(hint);
-        }
-
-        // Ограничиваем количество
-        if (this.userAnswers[this.currentQuestion].length >= 5) {
-            document.getElementById('practice-input').disabled = true;
-            document.getElementById('add-hint-input').disabled = true;
-        }
     }
 
-    isHintSelected(hint) {
-        const selectedHints = document.querySelectorAll('.selected-hint');
-        return Array.from(selectedHints).some(el => 
-            el.textContent.replace('×', '').trim() === hint
-        );
-    }
-
-    removeHintFromAnswers(hint) {
-        if (this.userAnswers[this.currentQuestion]) {
-            this.userAnswers[this.currentQuestion] = 
-                this.userAnswers[this.currentQuestion].filter(a => a !== hint);
-        }
+    updateSelectedList(emotions, listElement, countElement) {
+        listElement.innerHTML = emotions.map(emotion => `
+            <span class="selected-emotion">
+                ${emotion}
+                <button class="remove-emotion" data-emotion="${emotion}">×</button>
+            </span>
+        `).join('');
         
-        // Разблокируем ввод если нужно
-        if (this.userAnswers[this.currentQuestion].length < 5) {
-            document.getElementById('practice-input').disabled = false;
-            document.getElementById('add-hint-input').disabled = false;
-        }
+        countElement.textContent = emotions.length;
+        
+        // Обработчики для удаления
+        listElement.querySelectorAll('.remove-emotion').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const emotion = btn.dataset.emotion;
+                const newEmotions = emotions.filter(e => e !== emotion);
+                this.userAnswers[this.currentQuestion] = newEmotions;
+                this.updateSelectedList(newEmotions, listElement, countElement);
+                
+                // Снимаем выделение с кнопки
+                const emotionBtn = document.querySelector(`.emotion-btn[data-emotion="${emotion}"]`);
+                if (emotionBtn) emotionBtn.classList.remove('selected');
+            });
+        });
     }
 
     saveAnswer(type) {
@@ -346,6 +367,7 @@ class TestSystem {
             this.userAnswers[this.currentQuestion] = 
                 Array.from(selected).map(opt => opt.dataset.value);
         }
+        // Для practice ответы сохраняются в setupPracticeHandlers
     }
 
     nextQuestion() {
@@ -355,7 +377,7 @@ class TestSystem {
         if (testData.questions[this.currentQuestion].type === 'practice') {
             if (!this.userAnswers[this.currentQuestion] || 
                 this.userAnswers[this.currentQuestion].length === 0) {
-                alert('Пожалуйста, введите хотя бы один ответ');
+                alert('Пожалуйста, выберите хотя бы один вариант');
                 return;
             }
         } else {
@@ -388,9 +410,13 @@ class TestSystem {
         const testData = TESTS_DATA[this.currentTest];
         const progress = ((this.currentQuestion + 1) / testData.questions.length) * 100;
         
-        document.getElementById('progress-fill').style.width = `${progress}%`;
-        document.getElementById('progress-text').textContent = 
-            `Вопрос ${this.currentQuestion + 1} из ${testData.questions.length}`;
+        const progressFill = document.getElementById('progress-fill');
+        const progressText = document.getElementById('progress-text');
+        
+        if (progressFill) progressFill.style.width = `${progress}%`;
+        if (progressText) {
+            progressText.textContent = `Вопрос ${this.currentQuestion + 1} из ${testData.questions.length}`;
+        }
     }
 
     completeTest() {
@@ -400,8 +426,12 @@ class TestSystem {
         // Скрываем вопросы, показываем результаты
         document.getElementById('current-test').style.display = 'none';
         document.getElementById('test-results').style.display = 'block';
-        document.getElementById('next-question').style.display = 'none';
-        document.getElementById('prev-question').style.display = 'none';
+        
+        const nextBtn = document.getElementById('next-question');
+        const prevBtn = document.getElementById('prev-question');
+        
+        if (nextBtn) nextBtn.style.display = 'none';
+        if (prevBtn) prevBtn.style.display = 'none';
         
         // Рассчитываем результаты
         this.calculateResults();
@@ -469,13 +499,13 @@ class TestSystem {
                 }
                 
             } else if (question.type === 'practice') {
-                // Практические вопросы с вводом ответов
+                // Практические вопросы с эмоциями
                 const maxPoints = question.correctAnswers.length;
                 results.maxScore += maxPoints;
                 
                 let points = 0;
                 const correctSet = new Set(question.correctAnswers);
-                const incorrectSet = new Set(question.incorrectAnswers);
+                const incorrectSet = new Set(question.incorrectAnswers || []);
                 
                 userAnswer.forEach(answer => {
                     if (correctSet.has(answer)) {
@@ -512,105 +542,113 @@ class TestSystem {
         const percentage = Math.round((results.totalScore / results.maxScore) * 100);
         
         // Общий балл
-        document.getElementById('total-score').textContent = 
-            `${results.totalScore}/${results.maxScore} (${percentage}%)`;
+        const totalScoreElement = document.getElementById('total-score');
+        if (totalScoreElement) {
+            totalScoreElement.textContent = `${results.totalScore}/${results.maxScore} (${percentage}%)`;
+        }
         
         // Сообщение
-        const message = this.getResultMessage(percentage);
-        document.getElementById('result-message').textContent = message;
+        const messageElement = document.getElementById('result-message');
+        if (messageElement) {
+            messageElement.textContent = this.getResultMessage(percentage);
+        }
         
         // Аспекты
         const aspectsGrid = document.getElementById('aspects-grid');
-        let aspectsHTML = '';
-        
-        Object.keys(results.aspects).forEach(aspectKey => {
-            const aspect = results.aspects[aspectKey];
-            const aspectPercentage = Math.round((aspect.score / aspect.max) * 100);
-            const aspectInfo = ASPECTS_INFO[this.currentTest]?.[aspectKey] || 
-                             { name: aspectKey, description: '' };
+        if (aspectsGrid) {
+            let aspectsHTML = '';
             
-            let level = 'Низкий';
-            let color = '#FF5252';
+            Object.keys(results.aspects).forEach(aspectKey => {
+                const aspect = results.aspects[aspectKey];
+                const aspectPercentage = Math.round((aspect.score / aspect.max) * 100);
+                const aspectInfo = ASPECTS_INFO[this.currentTest]?.[aspectKey] || 
+                                 { name: aspectKey, description: '' };
+                
+                let level = 'Низкий';
+                let color = '#FF5252';
+                
+                if (aspectPercentage >= 80) {
+                    level = 'Высокий';
+                    color = '#4CAF50';
+                } else if (aspectPercentage >= 60) {
+                    level = 'Средний';
+                    color = '#FF9800';
+                }
+                
+                aspectsHTML += `
+                    <div class="aspect-result-card">
+                        <div class="aspect-header">
+                            <h5>${aspectInfo.name}</h5>
+                            <span class="aspect-level" style="background: ${color}20; color: ${color}">
+                                ${level}
+                            </span>
+                        </div>
+                        <p class="aspect-desc">${aspectInfo.description}</p>
+                        <div class="aspect-score">
+                            <span class="score-value">${aspect.score}/${aspect.max}</span>
+                            <span class="score-percent">(${aspectPercentage}%)</span>
+                        </div>
+                        <div class="progress-bar-small">
+                            <div class="progress-fill-small" style="width: ${aspectPercentage}%; background: ${color}"></div>
+                        </div>
+                    </div>
+                `;
+            });
             
-            if (aspectPercentage >= 80) {
-                level = 'Высокий';
-                color = '#4CAF50';
-            } else if (aspectPercentage >= 60) {
-                level = 'Средний';
-                color = '#FF9800';
-            }
-            
-            aspectsHTML += `
-                <div class="aspect-result-card">
-                    <div class="aspect-header">
-                        <h5>${aspectInfo.name}</h5>
-                        <span class="aspect-level" style="background: ${color}20; color: ${color}">
-                            ${level}
-                        </span>
-                    </div>
-                    <p class="aspect-desc">${aspectInfo.description}</p>
-                    <div class="aspect-score">
-                        <span class="score-value">${aspect.score}/${aspect.max}</span>
-                        <span class="score-percent">(${aspectPercentage}%)</span>
-                    </div>
-                    <div class="progress-bar-small">
-                        <div class="progress-fill-small" style="width: ${aspectPercentage}%; background: ${color}"></div>
-                    </div>
-                </div>
-            `;
-        });
-        
-        aspectsGrid.innerHTML = aspectsHTML;
+            aspectsGrid.innerHTML = aspectsHTML;
+        }
         
         // Рекомендации
-        const recommendations = this.getRecommendations(percentage);
-        document.getElementById('recommendations').innerHTML = recommendations;
+        const recommendationsElement = document.getElementById('recommendations');
+        if (recommendationsElement) {
+            recommendationsElement.innerHTML = this.getRecommendations(percentage);
+        }
     }
 
     getResultMessage(percentage) {
         if (percentage >= 90) {
-            return 'Потрясающий результат! У вас отлично развиты навыки, которые вы тестировали.';
+            return 'Отличный результат! У вас хорошо развиты тестируемые навыки.';
         } else if (percentage >= 70) {
-            return 'Хороший результат! Есть некоторые области для развития, но в целом вы на правильном пути.';
+            return 'Хороший результат! Есть области для развития, но вы на правильном пути.';
         } else if (percentage >= 50) {
-            return 'Средний результат. Есть над чем поработать, но базовые навыки присутствуют.';
+            return 'Средний результат. Базовые навыки присутствуют, есть куда расти.';
         } else {
             return 'Результат ниже среднего. Рекомендуем уделить внимание развитию этих навыков.';
         }
     }
 
     getRecommendations(percentage) {
-        const testData = TESTS_DATA[this.currentTest];
         let recommendations = '<h4>📋 Рекомендации для развития</h4><ul>';
         
         if (percentage < 70) {
             recommendations += `
                 <li>Практикуйте осознанность и рефлексию</li>
-                <li>Читайте литературу по развитию эмоционального интеллекта</li>
-                <li>Обращайте внимание на свои эмоции в повседневных ситуациях</li>
+                <li>Ведите дневник эмоций</li>
+                <li>Обращайте внимание на свои реакции в разных ситуациях</li>
             `;
             
-            if (this.currentTest === 'empathy') {
+            if (this.currentTest === 'eq') {
                 recommendations += `
-                    <li>Попробуйте практику "активного слушания"</li>
-                    <li>Чаще задавайте вопросы о чувствах других людей</li>
+                    <li>Наблюдайте за своими эмоциями в течение дня</li>
+                    <li>Изучайте литературу по эмоциональному интеллекту</li>
                 `;
-            } else if (this.currentTest === 'social') {
+            } else if (this.currentTest === 'empathy') {
                 recommendations += `
-                    <li>Участвуйте в групповых обсуждениях</li>
-                    <li>Наблюдайте за успешными коммуникаторами</li>
+                    <li>Практикуйте активное слушание</li>
+                    <li>Старайтесь понять чувства других людей</li>
                 `;
-            } else if (this.currentTest === 'calm') {
+            } else if (this.currentTest === 'calm' || this.currentTest === 'stress') {
                 recommendations += `
-                    <li>Изучите техники глубокого дыхания</li>
-                    <li>Практикуйте медитацию 5-10 минут в день</li>
+                    <li>Изучите техники дыхания</li>
+                    <li>Практикуйте короткие медитации</li>
+                    <li>Регулярно делайте перерывы в работе</li>
                 `;
             }
         } else {
             recommendations += `
-                <li>Продолжайте практиковать и развивать свои навыки</li>
-                <li>Помогайте другим развивать аналогичные навыки</li>
-                <li>Попробуйте более сложные тесты и практики</li>
+                <li>Продолжайте развивать свои навыки</li>
+                <li>Помогайте другим в развитии</li>
+                <li>Ищите новые практики для совершенствования</li>
             `;
         }
         
@@ -675,18 +713,22 @@ class TestSystem {
             }
         });
         
-        document.getElementById('total-tests').textContent = totalTests;
-        document.getElementById('last-test').textContent = lastTest;
+        const totalTestsElement = document.getElementById('total-tests');
+        const lastTestElement = document.getElementById('last-test');
+        const avgEqElement = document.getElementById('avg-eq');
+        const progressElement = document.getElementById('progress');
         
-        if (eqTests > 0) {
-            document.getElementById('avg-eq').textContent = 
-                Math.round(totalEqScore / eqTests) + '%';
+        if (totalTestsElement) totalTestsElement.textContent = totalTests;
+        if (lastTestElement) lastTestElement.textContent = lastTest;
+        
+        if (eqTests > 0 && avgEqElement) {
+            avgEqElement.textContent = Math.round(totalEqScore / eqTests) + '%';
         }
         
         // Прогресс (процент пройденных тестов от всех доступных)
         const totalAvailableTests = Object.keys(TESTS_DATA).length;
         const progress = Math.min(100, Math.round((totalTests / (totalAvailableTests * 3)) * 100));
-        document.getElementById('progress').textContent = progress + '%';
+        if (progressElement) progressElement.textContent = progress + '%';
     }
 
     saveResultsToJournal() {
@@ -721,41 +763,30 @@ class TestSystem {
     }
 
     retakeTest() {
-        document.getElementById('test-results').style.display = 'none';
-        document.getElementById('current-test').style.display = 'block';
-        document.getElementById('next-question').style.display = 'block';
+        const testResults = document.getElementById('test-results');
+        const currentTest = document.getElementById('current-test');
+        const nextBtn = document.getElementById('next-question');
+        
+        if (testResults) testResults.style.display = 'none';
+        if (currentTest) currentTest.style.display = 'block';
+        if (nextBtn) nextBtn.style.display = 'block';
         
         this.startTest();
-    }
-
-    shuffleArray(array) {
-        for (let i = array.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [array[i], array[j]] = [array[j], array[i]];
-        }
-        return array;
-    }
-
-    updateTestSelection() {
-        // Выбираем первый тест по умолчанию
-        this.selectTest('eq');
     }
 }
 
 // ============================================================================
-// БАЗА ДАННЫХ ТЕСТОВ
+// БАЗА ДАННЫХ ТЕСТОВ - ИСПРАВЛЕННАЯ ВЕРСИЯ
 // ============================================================================
 
 const TESTS_DATA = {
     // ТЕСТ НА ЭМОЦИОНАЛЬНЫЙ ИНТЕЛЛЕКТ
     eq: {
         title: '🧠 Тест на эмоциональный интеллект',
-        description: 'Измерьте вашу способность понимать, использовать и управлять своими эмоциями',
-        time: '5 минут',
-        questions: '15 вопросов',
-        parts: 'Теоретическая + Практическая часть',
+        description: 'Измерьте вашу способность понимать и управлять своими эмоциями',
+        time: '5-7 минут',
+        parts: 'Теория + Практика',
         questions: [
-            // Теоретические вопросы
             {
                 type: 'theory',
                 text: 'Когда вы видите, что кто-то расстроен, вы обычно:',
@@ -793,44 +824,27 @@ const TESTS_DATA = {
                 ]
             },
             {
-                type: 'theory',
-                text: 'Если вы опаздываете на важную встречу, как вы себя ведёте?',
-                aspect: 'self_awareness',
-                correctAnswer: '3',
-                points: 3,
-                options: [
-                    { text: 'Стараюсь успокоиться и не винить себя', value: '3' },
-                    { text: 'Придумываю как оправдаться, стараюсь успокоиться', value: '2' },
-                    { text: 'Как я мог опоздать на такую важную встречу? Буду очень торопиться, придумаю оправдание и буду винить себя.', value: '1' }
-                ]
-            },
-            {
                 type: 'multi',
                 text: 'Какие эмоции вы чаще всего испытываете в течение дня? (выберите до 3)',
                 aspect: 'emotional_range',
                 correctAnswers: ['радость', 'спокойствие', 'интерес', 'удовлетворённость'],
-                incorrectAnswers: ['гнев', 'тревога', 'скука', 'раздражение', 'не знаю'],
-                points: 3
+                points: 3,
+                options: [
+                    { text: 'радость', value: 'радость' },
+                    { text: 'спокойствие', value: 'спокойствие' },
+                    { text: 'интерес', value: 'интерес' },
+                    { text: 'тревога', value: 'тревога' },
+                    { text: 'гнев', value: 'гнев' },
+                    { text: 'скука', value: 'скука' }
+                ]
             },
-            {
-                type: 'multi',
-                text: 'Какие эмоции/чувства/состояния вы испытываете перед важной встречей? (выберите до 3)',
-                aspect: 'emotional_range',
-                correctAnswers: ['возможность', 'спокойствие', 'интерес', 'удовлетворённость', 'небольшой стресс', 'оптимизм', 'реализм'],
-                incorrectAnswers: ['гнев', 'тревога', 'скука', 'раздражение', 'не знаю', 'пессимизм', 'страх'],
-                points: 3
-            },
-            // Практические вопросы (случайно выбираются из базы)
             {
                 type: 'practice',
-                text: 'Практическая задача: Распознавание эмоций',
+                text: 'Какие эмоции вы испытываете перед важной встречей?',
                 aspect: 'emotion_recognition',
-                scenario: 'Вы видите коллегу, который только что вышел из кабинета начальника. Он избегает зрительного контакта, говорит тихим голосом и постоянно поправляет галстук.',
-                instruction: 'Какие эмоции, по вашему мнению, испытывает коллега?',
-                hint: 'Введите через запятую до 5 предполагаемых эмоций',
-                placeholder: 'Введите через запятую до 5 предполагаемых эмоций. Например: тревога, неуверенность, волнение, спокойствие...',
-                correctAnswers: ['тревога', 'нервозность', 'неуверенность', 'волнение', 'опасение'],
-                incorrectAnswers: ['радость', 'гнев', 'отвращение', 'гордость', 'облегчение', 'спокойствие', 'удовлетворённость', 'сосредоточенность']
+                instruction: 'Выберите до 6 эмоций, которые описывают ваше состояние:',
+                correctAnswers: ['волнение', 'интерес', 'ответственность', 'сосредоточенность'],
+                incorrectAnswers: ['безразличие', 'апатия', 'злость', 'отвращение']
             }
         ]
     },
@@ -838,35 +852,10 @@ const TESTS_DATA = {
     // ТЕСТ НА ЭМПАТИЮ
     empathy: {
         title: '💝 Тест на эмпатию',
-        description: 'Измерьте вашу способность понимать и разделять чувства других людей',
-        time: '5 минут',
-        questions: '12 вопросов',
-        parts: 'Теоретическая + Практическая часть',
+        description: 'Измерьте вашу способность понимать и разделять чувства других',
+        time: '4-6 минут',
+        parts: 'Теория + Практика',
         questions: [
-            // База практических вопросов для случайного выбора
-            {
-                type: 'practice',
-                text: 'Ситуация 1: Офисный конфликт',
-                aspect: 'empathy_recognition',
-                scenario: 'Два коллеги спорят из-за проекта. Один говорит громко и жестикулирует, другой молчит и смотрит в пол.',
-                instruction: 'Что чувствует каждый из участников ситуации?',
-                hint: 'Для каждого человека укажите 2-3 основные эмоции',
-                placeholder: 'Первый: ... Второй: ...',
-                correctAnswers: ['первый: раздражение, гнев, фруструация', 
-                                'второй: обида, подавленность, беспомощность'],
-                incorrectAnswers: ['первый: радость, удовольствие', 
-                                  'второй: безразличие, скука']
-            },
-            {
-                type: 'practice',
-                text: 'Ситуация 2: Семейный ужин',
-                aspect: 'empathy_recognition',
-                scenario: 'За ужином подросток рассказывает о проблемах в школе. Родитель слушает, но постоянно проверяет телефон.',
-                instruction: 'Какие эмоции испытывает подросток в этой ситуации?',
-                correctAnswers: ['разочарование', 'обида', 'одиночество', 'неважность'],
-                incorrectAnswers: ['радость', 'гордость', 'облегчение', 'безразличие']
-            },
-            // Теоретические вопросы
             {
                 type: 'theory',
                 text: 'Когда друг рассказывает о своей проблеме, вы обычно:',
@@ -879,12 +868,12 @@ const TESTS_DATA = {
                 ]
             },
             {
-                type: 'multi',
-                text: 'В каких ситуациях вы обычно проявляете эмпатию?',
-                aspect: 'empathy_expression',
-                correctAnswers: ['когда близкому плохо', 'при виде несправедливости', 'когда человек просит поддержки', 'при просмотре фильмов к персонажам'],
-                incorrectAnswers: ['всегда', 'никогда', 'только если это выгодно', 'только с близкими родственниками'],
-                points: 2
+                type: 'practice',
+                text: 'Ваш коллега получил повышение. Какие эмоции он может испытывать?',
+                aspect: 'empathy_recognition',
+                instruction: 'Выберите вероятные эмоции:',
+                correctAnswers: ['радость', 'гордость', 'удовлетворение', 'ответственность'],
+                incorrectAnswers: ['разочарование', 'злость', 'зависть', 'скука']
             }
         ]
     },
@@ -892,20 +881,10 @@ const TESTS_DATA = {
     // ТЕСТ НА СОЦИАЛЬНЫЙ ИНТЕЛЛЕКТ
     social: {
         title: '👥 Тест на социальный интеллект',
-        description: 'Оцените вашу способность понимать социальные ситуации и эффективно взаимодействовать',
-        time: '5 минут',
-        questions: '3 вопроса',
-        parts: 'Теоретическая + Практическая часть',
+        description: 'Оцените вашу способность понимать социальные ситуации',
+        time: '3-5 минут',
+        parts: 'Теория + Практика',
         questions: [
-            {
-                type: 'practice',
-                text: 'Ситуация: Сложные переговоры',
-                aspect: 'social_perception',
-                scenario: 'На совещании один участник постоянно перебивает других, говорит уверенно, но его идеи непрактичны.',
-                instruction: 'Как бы вы поступили в этой ситуации?',
-                correctAnswers: ['выслушать всех', 'задать уточняющие вопросы', 'предложить структурировать обсуждение'],
-                incorrectAnswers: ['перебить в ответ', 'промолчать', 'сразу критиковать идеи', 'выйти из совещания']
-            },
             {
                 type: 'theory',
                 text: 'В новой компании вы обычно:',
@@ -920,29 +899,20 @@ const TESTS_DATA = {
         ]
     },
     
-    // ТЕСТ НА СПОСОБНОСТЬ УСПОКОИТЬ СЕБЯ
+    // ТЕСТ НА САМОРЕГУЛЯЦИЮ
     calm: {
         title: '🧘 Тест на саморегуляцию',
         description: 'Оцените ваши способности успокаивать себя в стрессовых ситуациях',
-        time: '8-10 минут',
-        questions: '10 вопросов',
-        parts: 'Теоретическая + Практическая часть',
+        time: '5-7 минут',
+        parts: 'Теория + Практика',
         questions: [
             {
                 type: 'practice',
-                text: 'Ситуация: Проваленный дедлайн',
+                text: 'Какие методы помогают вам успокоиться?',
                 aspect: 'stress_management',
-                scenario: 'Вы не успели выполнить важную работу к сроку. Начальник требует объяснений.',
-                instruction: 'Какие техники вы бы использовали, чтобы успокоиться?',
-                correctAnswers: ['глубокое дыхание', 'перерыв 5 минут', 'позитивный внутренний диалог'],
+                instruction: 'Выберите до 6 эффективных для вас методов:',
+                correctAnswers: ['глубокое дыхание', 'прогулка на свежем воздухе', 'разговор с близким', 'медитация'],
                 incorrectAnswers: ['игнорирование проблемы', 'самокритика', 'паника']
-            },
-            {
-                type: 'multi',
-                text: 'Какие методы вы используете для снятия напряжения?',
-                aspect: 'coping_strategies',
-                correctAnswers: ['дыхательные упражнения', 'физическая активность', 'разговор с близким'],
-                incorrectAnswers: ['алкоголь', 'агрессия', 'игнорирование эмоций']
             }
         ]
     },
@@ -950,10 +920,9 @@ const TESTS_DATA = {
     // ТЕСТ НА УПРАВЛЕНИЕ СТРЕССОМ
     stress: {
         title: '⚡ Тест на управление стрессом',
-        description: 'Оцените вашу устойчивость к стрессу и методы совладания',
-        time: '5 минут',
-        questions: '12 вопросов',
-        parts: 'Теоретическая + Практическая часть',
+        description: 'Оцените вашу устойчивость к стрессу',
+        time: '4-6 минут',
+        parts: 'Теория',
         questions: [
             {
                 type: 'theory',
@@ -965,45 +934,32 @@ const TESTS_DATA = {
                     { text: 'Нуждаетесь в небольшой паузе, чтобы собраться', value: '2' },
                     { text: 'Теряете способность мыслить рационально', value: '1' }
                 ]
-            },
-            {
-                type: 'practice',
-                text: 'Ситуация: Многозадачность',
-                aspect: 'multitasking_stress',
-                scenario: 'У вас одновременно: срочный звонок, три непрочитанных письма и коллега с вопросом.',
-                instruction: 'Как бы вы расставили приоритеты и успокоились?',
-                correctAnswers: ['определить срочность задач', 'сделать глубокий вдох', 'начать с самой важной задачи'],
-                incorrectAnswers: ['паниковать', 'браться за все сразу', 'игнорировать все']
             }
         ]
     }
 };
 
-// Информация об аспектах для каждого теста
+// Информация об аспектах
 const ASPECTS_INFO = {
     eq: {
         empathy: { name: 'Эмпатия', description: 'Способность понимать чувства других' },
         self_control: { name: 'Самоконтроль', description: 'Управление своими эмоциями' },
         self_awareness: { name: 'Самосознание', description: 'Понимание собственных эмоций' },
         emotional_range: { name: 'Эмоциональный диапазон', description: 'Разнообразие переживаемых эмоций' },
-        emotion_recognition: { name: 'Распознавание эмоций', description: 'Определение эмоций по невербальным сигналам' }
+        emotion_recognition: { name: 'Распознавание эмоций', description: 'Определение собственных эмоций' }
     },
     empathy: {
-        empathy_recognition: { name: 'Распознавание эмпатии', description: 'Определение эмоционального состояния других' },
         active_listening: { name: 'Активное слушание', description: 'Внимание к словам и чувствам собеседника' },
-        empathy_expression: { name: 'Проявление эмпатии', description: 'Выражение понимания и поддержки' }
+        empathy_recognition: { name: 'Распознавание эмоций других', description: 'Определение эмоций других людей' }
     },
     social: {
-        social_perception: { name: 'Социальное восприятие', description: 'Понимание социальных ситуаций' },
         social_adaptation: { name: 'Социальная адаптация', description: 'Приспособление к разным социальным контекстам' }
     },
     calm: {
-        stress_management: { name: 'Управление стрессом', description: 'Способность снижать уровень стресса' },
-        coping_strategies: { name: 'Стратегии совладания', description: 'Эффективные методы саморегуляции' }
+        stress_management: { name: 'Управление стрессом', description: 'Способность снижать уровень стресса' }
     },
     stress: {
-        stress_response: { name: 'Реакция на стресс', description: 'Поведение в стрессовых ситуациях' },
-        multitasking_stress: { name: 'Стресс при многозадачности', description: 'Управление несколькими задачами' }
+        stress_response: { name: 'Реакция на стресс', description: 'Поведение в стрессовых ситуациях' }
     }
 };
 
@@ -1011,22 +967,3 @@ const ASPECTS_INFO = {
 document.addEventListener('DOMContentLoaded', () => {
     window.testSystem = new TestSystem();
 });
-
-// Функция для получения случайных вопросов из базы
-function getRandomQuestions(testType, count = 2) {
-    const testData = TESTS_DATA[testType];
-    const allQuestions = [...testData.questions];
-    const shuffled = [...allQuestions].sort(() => Math.random() - 0.5);
-    return shuffled.slice(0, count);
-}
-
-// Функция для перемешивания вариантов ответов
-function shuffleOptions(question) {
-    if (question.options) {
-        const shuffledOptions = [...question.options].sort(() => Math.random() - 0.5);
-        return { ...question, options: shuffledOptions };
-    }
-    return question;
-}
-
-

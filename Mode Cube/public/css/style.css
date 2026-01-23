@@ -1160,3 +1160,401 @@ h3 {
         font-size: 1.5rem;
     }
 }
+
+/* ================================
+   СТИЛИ ДЛЯ СИСТЕМЫ ТЕСТОВ
+   ================================ */
+
+/* Выбор теста */
+.tests-selection {
+    margin-bottom: 30px;
+}
+
+.test-categories {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.test-category-btn {
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 2px solid transparent;
+    border-radius: 15px;
+    color: white;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    flex: 1;
+    min-width: 200px;
+    text-align: left;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.test-category-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateY(-3px);
+}
+
+.test-category-btn.active {
+    background: rgba(0, 219, 222, 0.15);
+    border-color: #00dbde;
+    box-shadow: 0 5px 15px rgba(0, 219, 222, 0.2);
+}
+
+/* Описание теста */
+.test-meta {
+    display: flex;
+    gap: 20px;
+    margin: 20px 0;
+    color: #a0a0c0;
+    font-size: 1rem;
+}
+
+.test-meta span {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+/* Навигация теста */
+.test-navigation {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 30px;
+}
+
+/* Результаты теста */
+.test-results {
+    animation: fadeIn 0.5s ease;
+}
+
+.result-header {
+    text-align: center;
+    margin-bottom: 40px;
+    padding: 30px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 20px;
+}
+
+.score-card {
+    text-align: center;
+    margin: 30px auto;
+    padding: 40px;
+    background: linear-gradient(135deg, rgba(0, 219, 222, 0.1), rgba(252, 0, 255, 0.1));
+    border-radius: 20px;
+    max-width: 400px;
+}
+
+.score-value {
+    font-size: 3.5rem;
+    font-weight: bold;
+    color: #00dbde;
+    margin-bottom: 10px;
+}
+
+.score-label {
+    font-size: 1.2rem;
+    color: #a0a0c0;
+}
+
+.aspects-results {
+    margin-top: 40px;
+}
+
+.aspects-results h4 {
+    text-align: center;
+    margin-bottom: 25px;
+    color: #e0e0ff;
+    font-size: 1.4rem;
+}
+
+.aspects-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+.aspect-result-card {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 15px;
+    padding: 25px;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.aspect-result-card:hover {
+    transform: translateY(-5px);
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.aspect-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.aspect-header h5 {
+    font-size: 1.2rem;
+    color: #e0e0ff;
+}
+
+.aspect-level {
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: bold;
+}
+
+.aspect-desc {
+    color: #a0a0c0;
+    font-size: 0.95rem;
+    margin-bottom: 15px;
+    line-height: 1.5;
+}
+
+.aspect-score {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 15px 0 10px;
+}
+
+.score-value {
+    font-size: 1.4rem;
+    font-weight: bold;
+    color: #00dbde;
+}
+
+.score-percent {
+    color: #a0a0c0;
+    font-size: 1rem;
+}
+
+.progress-bar-small {
+    height: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-top: 10px;
+}
+
+.progress-fill-small {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.5s ease;
+}
+
+/* Практические вопросы */
+.practice-question {
+    margin: 20px 0;
+}
+
+.practice-scenario {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 20px;
+    border-radius: 15px;
+    border-left: 4px solid #00dbde;
+    margin-bottom: 25px;
+    font-size: 1.1rem;
+    line-height: 1.6;
+}
+
+.practice-instructions {
+    background: rgba(255, 255, 255, 0.03);
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+}
+
+.practice-instructions strong {
+    color: #00dbde;
+}
+
+.practice-input-container {
+    position: relative;
+    margin: 25px 0;
+}
+
+#practice-input {
+    width: 100%;
+    padding: 15px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+    color: white;
+    font-size: 1rem;
+    resize: vertical;
+    min-height: 100px;
+    font-family: inherit;
+}
+
+#practice-input:focus {
+    outline: none;
+    border-color: #00dbde;
+    background: rgba(255, 255, 255, 0.12);
+}
+
+.autocomplete-hints {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: #1a1a2e;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+    padding: 15px;
+    margin-top: 5px;
+    z-index: 100;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.hint-title {
+    color: #00dbde;
+    font-weight: bold;
+    margin-bottom: 10px;
+    font-size: 0.9rem;
+}
+
+.hint-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.hint-item {
+    padding: 8px 15px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.9rem;
+    border: 1px solid transparent;
+}
+
+.hint-item:hover {
+    background: rgba(0, 219, 222, 0.2);
+    border-color: rgba(0, 219, 222, 0.5);
+    transform: scale(1.05);
+}
+
+.add-hint-container {
+    display: flex;
+    gap: 10px;
+    margin: 20px 0;
+}
+
+#add-hint-input {
+    flex: 1;
+    padding: 12px 15px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+    color: white;
+    font-family: inherit;
+    font-size: 1rem;
+}
+
+#add-hint-input:focus {
+    outline: none;
+    border-color: #00dbde;
+}
+
+.selected-hints {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 20px;
+    min-height: 50px;
+}
+
+.selected-hint {
+    padding: 10px 15px;
+    background: rgba(0, 219, 222, 0.2);
+    border: 1px solid rgba(0, 219, 222, 0.5);
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.95rem;
+    animation: slideInRight 0.3s ease;
+}
+
+.remove-hint {
+    background: rgba(255, 100, 100, 0.3);
+    border: none;
+    color: #ff6464;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.remove-hint:hover {
+    background: rgba(255, 100, 100, 0.5);
+    transform: scale(1.1);
+}
+
+/* Действия с результатами */
+.result-actions {
+    display: flex;
+    gap: 20px;
+    margin-top: 40px;
+    justify-content: center;
+}
+
+.result-actions .submit-btn,
+.result-actions .nav-btn {
+    padding: 15px 30px;
+    font-size: 1.1rem;
+}
+
+/* Анимации */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideInRight {
+    from { opacity: 0; transform: translateX(20px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .test-category-btn {
+        min-width: 100%;
+    }
+    
+    .test-meta {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .aspects-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .result-actions {
+        flex-direction: column;
+    }
+    
+    .add-hint-container {
+        flex-direction: column;
+    }
+    
+    #add-hint-input {
+        width: 100%;
+    }
+}

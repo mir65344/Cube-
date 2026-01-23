@@ -74,34 +74,34 @@
                 <button id="prev-question" class="nav-btn" style="display: none;">← Назад</button>
                 <button id="next-question" class="submit-btn">Далее →</button>
             </div>
+        </div>
+        
+        <!-- результаты (отдельный блок) -->
+        <div class="quiz-container" id="test-results" style="display: none; margin-top: 30px;">
+            <div class="result-header">
+                <h3>🎉 Результаты теста</h3>
+                <p id="result-message"></p>
+            </div>
             
-            <!-- результаты -->
-            <div class="test-results" id="test-results" style="display: none;">
-                <div class="result-header">
-                    <h3>🎉 Результаты теста</h3>
-                    <p id="result-message"></p>
-                </div>
-                
-                <!-- oсновной результат -->
-                <div class="score-card">
-                    <div class="score-value" id="total-score">0/100</div>
-                    <div class="score-label">Общий балл</div>
-                </div>
-                
-                <!-- lетали по аспектам -->
-                <div class="aspects-results">
-                    <h4>📊 Результаты по аспектам</h4>
-                    <div class="aspects-grid" id="aspects-grid"></div>
-                </div>
-                
-                <!-- рекомендации -->
-                <div class="recommendations" id="recommendations"></div>
-                
-                <!-- cохранение результатов -->
-                <div class="result-actions">
-                    <button id="save-to-journal" class="submit-btn">💾 Сохранить в дневник</button>
-                    <button id="retake-test" class="nav-btn">🔄 Пройти тест заново</button>
-                </div>
+            <!-- основной результат -->
+            <div class="score-card">
+                <div class="score-value" id="total-score">0/0</div>
+                <div class="score-label">Общий балл</div>
+            </div>
+            
+            <!-- детали по аспектам -->
+            <div class="aspects-results">
+                <h4>📊 Результаты по аспектам</h4>
+                <div class="aspects-grid" id="aspects-grid"></div>
+            </div>
+            
+            <!-- рекомендации -->
+            <div class="recommendations" id="recommendations"></div>
+            
+            <!-- сохранение результатов -->
+            <div class="result-actions">
+                <button id="save-to-journal" class="submit-btn">💾 Сохранить в дневник</button>
+                <button id="retake-test" class="nav-btn">🔄 Пройти тест заново</button>
             </div>
         </div>
 
@@ -132,3 +132,4 @@
     <script src="js/eq-tests.js"></script>
 </body>
 </html>
+

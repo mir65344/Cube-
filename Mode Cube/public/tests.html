@@ -3,67 +3,132 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Тесты эмоционального интеллекта</title>
+    <title>Психологические тесты - Mood Cube</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>Тесты Эмоционального Интеллекта</h1>
-            <p class="subtitle">Пройдите тесты чтобы лучше понять свои эмоции и улучшить эмоциональное состояние</p>
+            <h1>🧠 Психологические тесты</h1>
+            <p class="subtitle">Пройдите тесты чтобы лучше понять себя и развить эмоциональный интеллект</p>
         </header>
 
         <nav class="page-nav">
             <a href="index.html" class="nav-btn">Главная</a>
-            <a href="tests.html" class="nav-btn active">Тесты EQ</a>
+            <a href="tests.html" class="nav-btn active">Тесты</a>
             <a href="journal.html" class="nav-btn">Дневник</a>
         </nav>
 
-        <div class="cube-container">
-            <div class="cube" id="cube">
-                <div class="face front"></div>
-                <div class="face back"></div>
-                <div class="face right"></div>
-                <div class="face left"></div>
-                <div class="face top"></div>
-                <div class="face bottom"></div>
+        <!-- выбор теста -->
+        <div class="tests-selection card">
+            <h3>🎯 Выберите тест</h3>
+            <div class="test-categories">
+                <button class="test-category-btn active" data-test="eq">
+                    🧠 Эмоциональный интеллект
+                </button>
+                <button class="test-category-btn" data-test="empathy">
+                    💝 Эмпатия
+                </button>
+                <button class="test-category-btn" data-test="social">
+                    👥 Социальный интеллект
+                </button>
+                <button class="test-category-btn" data-test="calm">
+                    🧘 Способность успокоить себя
+                </button>
+                <button class="test-category-btn" data-test="stress">
+                    ⚡ Управление стрессом
+                </button>
             </div>
         </div>
 
-        <div class="quiz-container">
-            <h2>Тест на эмоциональный интеллект</h2>
-            
-            <!-- Прогресс бар -->
+        <!-- описание выбранного теста -->
+        <div class="test-description card">
+            <h3 id="test-title">🧠 Тест на эмоциональный интеллект</h3>
+            <p id="test-description">Измерьте вашу способность понимать, использовать и управлять своими эмоциями</p>
+            <div class="test-meta">
+                <span>⏱️ <span id="test-time">10-15 минут</span></span>
+                <span>❓ <span id="test-questions">15 вопросов</span></span>
+                <span>📊 <span id="test-parts">Теоретическая + Практическая часть</span></span>
+            </div>
+            <button id="start-test" class="submit-btn">Начать тест</button>
+        </div>
+
+        <!-- контейнер теста (скрыт изначально) -->
+        <div class="quiz-container" id="test-container" style="display: none;">
+            <!-- прогресс бар -->
             <div class="progress-container">
                 <div class="progress-bar">
                     <div class="progress-fill" id="progress-fill"></div>
                 </div>
-                <div class="progress-text" id="progress-text">Вопрос 1 из 7</div>
+                <div class="progress-text" id="progress-text"></div>
             </div>
             
             <!-- Индикатор типа теста -->
-            <div class="test-type-indicator" id="test-type-indicator">
-                Теоретическая часть
+            <div class="test-type-indicator" id="test-type-indicator"></div>
+            
+            <!-- Контейнер для вопросов -->
+            <div id="current-test"></div>
+            
+            <!-- Кнопки навигации -->
+            <div class="test-navigation">
+                <button id="prev-question" class="nav-btn" style="display: none;">← Назад</button>
+                <button id="next-question" class="submit-btn">Далее →</button>
             </div>
             
-            <div id="eq-test">
-                <!-- тест будет загружен через Javascript -->
+            <!-- результаты -->
+            <div class="test-results" id="test-results" style="display: none;">
+                <div class="result-header">
+                    <h3>🎉 Результаты теста</h3>
+                    <p id="result-message"></p>
+                </div>
+                
+                <!-- oсновной результат -->
+                <div class="score-card">
+                    <div class="score-value" id="total-score">0/100</div>
+                    <div class="score-label">Общий балл</div>
+                </div>
+                
+                <!-- lетали по аспектам -->
+                <div class="aspects-results">
+                    <h4>📊 Результаты по аспектам</h4>
+                    <div class="aspects-grid" id="aspects-grid"></div>
+                </div>
+                
+                <!-- рекомендации -->
+                <div class="recommendations" id="recommendations"></div>
+                
+                <!-- cохранение результатов -->
+                <div class="result-actions">
+                    <button id="save-to-journal" class="submit-btn">💾 Сохранить в дневник</button>
+                    <button id="retake-test" class="nav-btn">🔄 Пройти тест заново</button>
+                </div>
             </div>
-            
-            <button class="submit-btn" id="submit-eq" style="display: none;">Завершить тест</button>
-            <div class="result" id="eq-result"></div>
-            <div class="recommendations" id="eq-recommendations" style="display: none;"></div>
-            
-            <!-- Детальные результаты -->
-            <div class="detailed-results" id="detailed-results" style="display: none;">
-                <h3>Детальный анализ вашего EQ</h3>
-                <div class="aspects-grid" id="aspects-grid"></div>
+        </div>
+
+        <!-- cтатистика пользователя -->
+        <div class="user-stats">
+            <h3>📈 Ваша статистика тестов</h3>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <span class="stat-label">Всего пройдено</span>
+                    <span class="stat-value" id="total-tests">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Средний балл EQ</span>
+                    <span class="stat-value" id="avg-eq">-</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Последний тест</span>
+                    <span class="stat-value" id="last-test">-</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Прогресс</span>
+                    <span class="stat-value" id="progress">0%</span>
+                </div>
             </div>
         </div>
     </div>
 
-    <script src="js/cube.js"></script>
     <script src="js/eq-tests.js"></script>
 </body>
 </html>
-

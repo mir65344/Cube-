@@ -1672,3 +1672,138 @@ h3 {
         font-size: 0.85rem;
     }
 }
+
+/* Дополнительные стили для упрощенной системы тестов */
+.correct-answer {
+    background: rgba(76, 175, 80, 0.3) !important;
+    border-color: #4CAF50 !important;
+    position: relative;
+}
+
+.correct-answer::after {
+    content: '✓';
+    position: absolute;
+    right: 15px;
+    color: #4CAF50;
+    font-weight: bold;
+}
+
+.incorrect-answer {
+    background: rgba(244, 67, 54, 0.2) !important;
+    border-color: #F44336 !important;
+    position: relative;
+}
+
+.incorrect-answer::after {
+    content: '✗';
+    position: absolute;
+    right: 15px;
+    color: #F44336;
+    font-weight: bold;
+}
+
+/* Стили для выбранных вариантов в теории */
+.option.selected {
+    background: rgba(100, 150, 255, 0.3) !important;
+    border-color: rgba(100, 150, 255, 0.7) !important;
+    transform: scale(1.02);
+}
+
+/* Анимация для ответов */
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+.option.selected {
+    animation: pulse 0.3s ease;
+}
+
+/* Улучшенные чекбоксы */
+.checkbox {
+    width: 22px;
+    height: 22px;
+    border: 2px solid rgba(255, 255, 255, 0.4);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+.checkbox.checked {
+    background: #00dbde;
+    border-color: #00dbde;
+}
+
+.checkbox.checked::after {
+    content: '✓';
+    color: white;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+/* Подсказка для множественного выбора */
+.multiple-hint {
+    color: #a0e0ff;
+    font-style: italic;
+    margin-bottom: 15px;
+    padding: 10px 15px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    border-left: 3px solid #00dbde;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .option {
+        padding: 16px;
+        font-size: 1rem;
+    }
+    
+    .checkbox {
+        width: 20px;
+        height: 20px;
+    }
+}
+
+/* Стили для заголовков тестов */
+.test-info {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 20px;
+    border-radius: 15px;
+    margin-bottom: 20px;
+    border-left: 4px solid #00dbde;
+}
+
+.test-info h3 {
+    color: #00dbde;
+    margin-bottom: 10px;
+}
+
+.test-info p {
+    color: #a0a0c0;
+    line-height: 1.5;
+}
+
+/* Кнопки тестов */
+.test-category-btn {
+    padding: 18px 25px;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+    text-align: left;
+}
+
+.test-category-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.test-category-btn.active {
+    background: rgba(0, 219, 222, 0.2) !important;
+    border-color: #00dbde !important;
+    box-shadow: 0 0 20px rgba(0, 219, 222, 0.3);
+}

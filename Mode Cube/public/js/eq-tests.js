@@ -1,7 +1,4 @@
-/**
- * Улучшенная система тестирования с визуализацией результатов
- */
-class EnhancedTestSystem {
+class SimpleTestSystem {
     constructor() {
         this.currentTest = null;
         this.currentQuestion = 0;
@@ -10,40 +7,11 @@ class EnhancedTestSystem {
         this.testCompleted = false;
         this.allQuestions = {};
         this.selectedQuestions = [];
-        
-        // Конфигурация тестов
+
         this.questionLimit = {
-            eq: 10,
-            empathy: 5,
-            social: 5
-        };
-        
-        // Настройки прогресс-баров
-        this.progressConfig = {
-            eq: {
-                maxScore: 30, // 10 вопросов × 3 балла
-                levels: {
-                    low: { min: 0, max: 14, color: '#ff6b6b', label: 'Низкий' },
-                    medium: { min: 15, max: 23, color: '#ffd93d', label: 'Средний' },
-                    high: { min: 24, max: 30, color: '#6bcf7f', label: 'Высокий' }
-                }
-            },
-            empathy: {
-                maxScore: 15, // 5 вопросов × 3 балла
-                levels: {
-                    low: { min: 0, max: 7, color: '#ff6b6b', label: 'Низкий' },
-                    medium: { min: 8, max: 12, color: '#ffd93d', label: 'Средний' },
-                    high: { min: 13, max: 15, color: '#6bcf7f', label: 'Высокий' }
-                }
-            },
-            social: {
-                maxScore: 15, // 5 вопросов × 3 балла
-                levels: {
-                    low: { min: 0, max: 7, color: '#ff6b6b', label: 'Низкий' },
-                    medium: { min: 8, max: 12, color: '#ffd93d', label: 'Средний' },
-                    high: { min: 13, max: 15, color: '#6bcf7f', label: 'Высокий' }
-                }
-            }
+            eq: 10,      // Брать 10 случайных вопросов из базы
+            empathy: 5,  // Брать 5 случайных вопросов
+            social: 5    // Брать 5 случайных вопросов
         };
         
         this.init();
@@ -53,104 +21,9 @@ class EnhancedTestSystem {
         this.loadQuestions();
         this.setupEventListeners();
         this.loadTestStats();
-        this.initResultsDisplay();
     }
 
-    initResultsDisplay() {
-        // Создаем контейнер для визуализации результатов, если его нет
-        const resultsContainer = document.getElementById('test-results');
-        if (resultsContainer && !resultsContainer.querySelector('.results-visualization')) {
-            const visualizationHTML = `
-                <div class="results-visualization">
-                    <div class="score-summary">
-                        <h3>📊 Результаты теста</h3>
-                        <div class="total-score-display">
-                            <span class="score-number" id="total-score">0</span>
-                            <span class="score-max">из <span id="max-score">0</span> баллов</span>
-                        </div>
-                        <div class="score-percentage" id="score-percentage">0%</div>
-                    </div>
-                    
-                    <div class="progress-section">
-                        <h4>Уровень развития</h4>
-                        <div class="progress-container">
-                            <div class="progress-bar" id="result-progress-bar">
-                                <div class="progress-fill" id="progress-fill-result"></div>
-                            </div>
-                            <div class="progress-labels">
-                                <span class="progress-label low">Низкий</span>
-                                <span class="progress-label medium">Средний</span>
-                                <span class="progress-label high">Высокий</span>
-                            </div>
-                        </div>
-                        <div class="level-indicator" id="level-indicator">
-                            <div class="level-dot"></div>
-                            <span class="level-text">Уровень: <span id="current-level">-</span></span>
-                        </div>
-                    </div>
-                    
-                    <div class="category-details">
-                        <h4>📈 Детальный анализ</h4>
-                        <div class="detail-item">
-                            <span class="detail-label">Правильные ответы:</span>
-                            <span class="detail-value" id="correct-answers">0</span>
-                        </div>
-                        <div class="detail-item">
-                            <span class="detail-label">Всего вопросов:</span>
-                            <span class="detail-value" id="total-questions">0</span>
-                        </div>
-                        <div class="detail-item">
-                            <span class="detail-label">Средний балл:</span>
-                            <span class="detail-value" id="average-score">0</span>
-                        </div>
-                    </div>
-                    
-                    <div class="interpretation-section">
-                        <h4>🎯 Интерпретация</h4>
-                        <div class="interpretation-text" id="result-interpretation">
-                            Пройдите тест, чтобы увидеть интерпретацию ваших результатов.
-                        </div>
-                    </div>
-                    
-                    <div class="recommendations-section">
-                        <h4>💡 Рекомендации для развития</h4>
-                        <div class="recommendations-list" id="detailed-recommendations">
-                            <div class="recommendation-item">
-                                <div class="recommendation-icon">📚</div>
-                                <div class="recommendation-text">Пройдите тест, чтобы получить персональные рекомендации</div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="next-steps">
-                        <h4>🚀 Следующие шаги</h4>
-                        <div class="steps-list" id="next-steps-list">
-                            <div class="step-item">
-                                <input type="checkbox" id="step1" disabled>
-                                <label for="step1">Пройдите другие тесты для полной картины</label>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="action-buttons">
-                        <button id="save-to-journal" class="btn-primary">
-                            <span class="btn-icon">📝</span> Сохранить в дневник
-                        </button>
-                        <button id="retake-test" class="btn-secondary">
-                            <span class="btn-icon">🔄</span> Пройти еще раз
-                        </button>
-                        <button id="share-results" class="btn-secondary">
-                            <span class="btn-icon">📤</span> Поделиться
-                        </button>
-                    </div>
-                </div>
-            `;
-            
-            resultsContainer.innerHTML = visualizationHTML;
-        }
-    }
-
-        loadQuestions() {
+    loadQuestions() {
     // База вопросов для EQ (20 вопросов)
     this.allQuestions.eq = [
         {
@@ -645,7 +518,7 @@ class EnhancedTestSystem {
 }
 
     setupEventListeners() {
-        // Существующие обработчики
+        // Выбор теста
         document.querySelectorAll('.test-category-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 document.querySelectorAll('.test-category-btn').forEach(b => {
@@ -656,137 +529,87 @@ class EnhancedTestSystem {
             });
         });
 
+        // Кнопка начала теста
         const startBtn = document.getElementById('start-test');
         if (startBtn) {
             startBtn.addEventListener('click', () => this.startTest());
         }
 
+        // Кнопки навигации
         const prevBtn = document.getElementById('prev-question');
         const nextBtn = document.getElementById('next-question');
         
         if (prevBtn) prevBtn.addEventListener('click', () => this.prevQuestion());
         if (nextBtn) nextBtn.addEventListener('click', () => this.nextQuestion());
 
-        // Новые обработчики для улучшенных результатов
-        document.addEventListener('click', (e) => {
-            if (e.target.id === 'save-to-journal') {
-                this.saveResultsToJournal();
-            }
-            if (e.target.id === 'retake-test') {
-                this.retakeTest();
-            }
-            if (e.target.id === 'share-results') {
-                this.shareResults();
-            }
-        });
-
-        // Динамические обработчики для рекомендаций
-        this.setupRecommendationHandlers();
-    }
-
-    setupRecommendationHandlers() {
-        document.addEventListener('click', (e) => {
-            if (e.target.classList.contains('recommendation-action')) {
-                const action = e.target.dataset.action;
-                this.handleRecommendationAction(action);
-            }
-        });
-    }
-
-    handleRecommendationAction(action) {
-        switch(action) {
-            case 'practice':
-                alert('Открываем упражнения для практики...');
-                break;
-            case 'resources':
-                alert('Подбираем полезные материалы...');
-                break;
-            case 'reminder':
-                this.setPracticeReminder();
-                break;
-        }
-    }
-
-    setPracticeReminder() {
-        const reminderTime = new Date(Date.now() + 24 * 60 * 60 * 1000); // Через 24 часа
-        const reminder = {
-            testType: this.currentTest,
-            time: reminderTime.toISOString(),
-            message: 'Время практиковать навыки!'
-        };
+        // Действия с результатами
+        const saveBtn = document.getElementById('save-to-journal');
+        const retakeBtn = document.getElementById('retake-test');
         
-        const reminders = JSON.parse(localStorage.getItem('practiceReminders') || '[]');
-        reminders.push(reminder);
-        localStorage.setItem('practiceReminders', JSON.stringify(reminders));
-        
-        alert('Напоминание установлено на завтра! 🎯');
+        if (saveBtn) saveBtn.addEventListener('click', () => this.saveResultsToJournal());
+        if (retakeBtn) retakeBtn.addEventListener('click', () => this.retakeTest());
     }
 
     selectTest(testType) {
-        // Существующий код с небольшими улучшениями
-        const testInfo = {
-            eq: {
-                title: '🧠 Тест на эмоциональный интеллект',
-                description: 'Оцените ваше умение понимать и управлять эмоциями',
-                time: '5-7 минут',
-                icon: '🧠'
-            },
-            empathy: {
-                title: '💝 Тест на эмпатию',
-                description: 'Определите уровень понимания чувств других людей',
-                time: '3-5 минут',
-                icon: '💝'
-            },
-            social: {
-                title: '👥 Тест на социальный интеллект',
-                description: 'Проанализируйте ваши навыки общения и взаимодействия',
-                time: '3-5 минут',
-                icon: '👥'
-            }
-        };
+    const testInfo = {
+        eq: {
+            title: '🧠 Тест на эмоциональный интеллект',
+            description: `${this.questionLimit.eq} случайных вопросов из базы`,
+            time: '5-7 минут'
+        },
+        empathy: {
+            title: '💝 Тест на эмпатию',
+            description: `${this.questionLimit.empathy} случайных вопросов из базы`,
+            time: '3-5 минут'
+        },
+        social: {
+            title: '👥 Тест на социальный интеллект',
+            description: `${this.questionLimit.social} случайных вопросов из базы`,
+            time: '3-5 минут'
+        }
+    };
 
-        const info = testInfo[testType];
-        if (!info) return;
+    const info = testInfo[testType];
+    if (!info) return;
 
-        this.currentTest = testType;
-        
-        // Обновляем описание с иконкой
-        document.getElementById('test-title').innerHTML = 
-            `${info.icon} ${info.title}`;
-        document.getElementById('test-description').textContent = info.description;
-        document.getElementById('test-time').textContent = `⏱ ${info.time}`;
-        document.getElementById('test-questions').textContent = 
-            `📝 ${this.questionLimit[testType]} вопросов`;
-        document.getElementById('test-parts').textContent = '🎯 Теория + Практика';
-    }
+    this.currentTest = testType;
+    
+    // Обновляем описание
+    document.getElementById('test-title').textContent = info.title;
+    document.getElementById('test-description').textContent = info.description;
+    document.getElementById('test-time').textContent = info.time;
+    document.getElementById('test-questions').textContent = `${this.questionLimit[testType]} случайных вопросов`;
+    document.getElementById('test-parts').textContent = 'Теория + Практика';
+}
 
     startTest() {
-        if (!this.currentTest) {
-            alert('Выберите тест для начала');
-            return;
-        }
-
-        this.testInProgress = true;
-        this.testCompleted = false;
-        this.currentQuestion = 0;
-        this.selectedQuestions = this.selectRandomQuestions(this.currentTest);
-        
-        if (this.selectedQuestions.length === 0) {
-            alert('Не удалось загрузить вопросы для теста');
-            return;
-        }
-        
-        this.userAnswers = new Array(this.selectedQuestions.length).fill(null);
-        
-        // Показываем контейнер теста
-        document.getElementById('test-container').style.display = 'block';
-        document.querySelector('.test-description').style.display = 'none';
-        document.querySelector('.tests-selection').style.display = 'none';
-        document.getElementById('test-results').style.display = 'none';
-        
-        this.loadQuestion();
-        this.updateProgress();
+    if (!this.currentTest) {
+        alert('Выберите тест для начала');
+        return;
     }
+
+    this.testInProgress = true;
+    this.testCompleted = false;
+    this.currentQuestion = 0;
+    this.selectedQuestions = this.selectRandomQuestions(this.currentTest);
+    
+    // Проверяем, что вопросы выбрались
+    if (this.selectedQuestions.length === 0) {
+        alert('Не удалось загрузить вопросы для теста');
+        return;
+    }
+    
+    this.userAnswers = new Array(this.selectedQuestions.length).fill(null);
+    
+    // Показываем контейнер теста
+    document.getElementById('test-container').style.display = 'block';
+    document.querySelector('.test-description').style.display = 'none';
+    document.querySelector('.tests-selection').style.display = 'none';
+    
+    // Загружаем первый вопрос
+    this.loadQuestion();
+    this.updateProgress();
+}
 
     loadQuestion() {
         const question = this.selectedQuestions[this.currentQuestion];
@@ -796,52 +619,42 @@ class EnhancedTestSystem {
             return;
         }
 
-        // Улучшенное отображение вопроса
+        // Создаем HTML вопроса
         let questionHTML = `
             <div class="question" data-index="${this.currentQuestion}">
-                <div class="question-header">
-                    <span class="question-number">Вопрос ${this.currentQuestion + 1}/${this.selectedQuestions.length}</span>
-                    <span class="question-type">${question.type === 'theory' ? 'Одиночный выбор' : 'Множественный выбор'}</span>
-                </div>
                 <h3>${question.text}</h3>
         `;
 
         if (question.type === 'theory') {
+            // Одиночный выбор
             questionHTML += '<div class="options">';
             question.options.forEach((option, index) => {
                 const isSelected = this.userAnswers[this.currentQuestion] === option.value;
-                const isCorrect = option.correct ? 'data-correct="true"' : '';
                 questionHTML += `
                     <div class="option ${isSelected ? 'selected' : ''}" 
                          data-value="${option.value}" 
-                         ${isCorrect}>
-                        <div class="option-selector"></div>
-                        <span class="option-text">${option.text}</span>
+                         data-correct="${option.correct}">
+                        <span>${option.text}</span>
                     </div>
                 `;
             });
             questionHTML += '</div>';
         } 
         else if (question.type === 'multi') {
+            // Множественный выбор
             const selected = this.userAnswers[this.currentQuestion] || [];
             questionHTML += `
-                <div class="multiple-info">
-                    <span class="multiple-hint">📌 Можно выбрать до ${question.maxChoices || 3} вариантов</span>
-                    <span class="selected-count">Выбрано: ${selected.length}/${question.maxChoices || 3}</span>
-                </div>
+                <p class="multiple-hint">Можно выбрать до ${question.maxChoices || 3} вариантов</p>
                 <div class="options multiple">
             `;
             question.options.forEach((option, index) => {
                 const isSelected = selected.includes(option.value);
-                const isCorrect = option.correct ? 'data-correct="true"' : '';
                 questionHTML += `
                     <div class="option ${isSelected ? 'selected' : ''}" 
                          data-value="${option.value}"
-                         ${isCorrect}>
-                        <div class="checkbox ${isSelected ? 'checked' : ''}">
-                            ${isSelected ? '✓' : ''}
-                        </div>
-                        <span class="option-text">${option.text}</span>
+                         data-correct="${option.correct}">
+                        <div class="checkbox ${isSelected ? 'checked' : ''}"></div>
+                        <span>${option.text}</span>
                     </div>
                 `;
             });
@@ -850,62 +663,75 @@ class EnhancedTestSystem {
 
         questionHTML += '</div>';
 
+        // Вставляем вопрос
         document.getElementById('current-test').innerHTML = questionHTML;
+
+        // Добавляем обработчики
         this.setupQuestionHandlers(question);
 
-        // Обновляем кнопки навигации
+        // Обновляем кнопку "Назад"
         const prevBtn = document.getElementById('prev-question');
-        const nextBtn = document.getElementById('next-question');
         if (prevBtn) {
-            prevBtn.style.display = this.currentQuestion > 0 ? 'flex' : 'none';
-            prevBtn.innerHTML = this.currentQuestion > 0 ? 
-                '← Предыдущий вопрос' : '';
-        }
-        if (nextBtn) {
-            nextBtn.innerHTML = this.currentQuestion < this.selectedQuestions.length - 1 ? 
-                'Следующий вопрос →' : 'Завершить тест';
+            prevBtn.style.display = this.currentQuestion > 0 ? 'block' : 'none';
         }
     }
 
     setupQuestionHandlers(question) {
-        const options = document.querySelectorAll('.option');
-        
-        options.forEach(option => {
-            option.addEventListener('click', () => {
-                if (this.testCompleted) return;
-                
-                if (question.type === 'theory') {
-                    // Одиночный выбор
+        if (question.type === 'theory') {
+            const options = document.querySelectorAll('.option');
+            options.forEach(option => {
+                option.addEventListener('click', () => {
+                    if (this.testCompleted) return;
+                    
+                    // Снимаем выделение со всех
                     options.forEach(opt => opt.classList.remove('selected'));
+                    
+                    // Выделяем выбранный
                     option.classList.add('selected');
+                    
+                    // Сохраняем ответ
                     this.userAnswers[this.currentQuestion] = option.dataset.value;
-                } 
-                else if (question.type === 'multi') {
-                    // Множественный выбор
+                    
+                    // Показываем правильность (опционально)
+                    if (this.showAnswers) {
+                        options.forEach(opt => {
+                            if (opt.dataset.correct === 'true') {
+                                opt.classList.add('correct-answer');
+                            } else if (opt.dataset.correct === 'false') {
+                                opt.classList.add('incorrect-answer');
+                            }
+                        });
+                    }
+                });
+            });
+        } 
+        else if (question.type === 'multi') {
+            const options = document.querySelectorAll('.option');
+            const maxChoices = question.maxChoices || 3;
+            
+            options.forEach(option => {
+                option.addEventListener('click', () => {
+                    if (this.testCompleted) return;
+                    
                     const selected = option.classList.contains('selected');
                     const currentSelected = document.querySelectorAll('.option.selected').length;
-                    const maxChoices = question.maxChoices || 3;
                     
                     if (!selected && currentSelected >= maxChoices) {
-                        return; // Не превышаем лимит
+                        alert(`Можно выбрать не более ${maxChoices} вариантов`);
+                        return;
                     }
                     
                     option.classList.toggle('selected');
-                    
-                    // Обновляем счетчик выбранных
-                    const selectedCount = document.querySelector('.selected-count');
-                    if (selectedCount) {
-                        const newCount = document.querySelectorAll('.option.selected').length;
-                        selectedCount.textContent = `Выбрано: ${newCount}/${maxChoices}`;
-                    }
+                    const checkbox = option.querySelector('.checkbox');
+                    if (checkbox) checkbox.classList.toggle('checked');
                     
                     // Сохраняем выбранные значения
                     const selectedValues = Array.from(document.querySelectorAll('.option.selected'))
                         .map(opt => opt.dataset.value);
                     this.userAnswers[this.currentQuestion] = selectedValues;
-                }
+                });
             });
-        });
+        }
     }
 
     nextQuestion() {
@@ -919,6 +745,7 @@ class EnhancedTestSystem {
             return;
         }
 
+        // Переходим к следующему вопросу
         this.currentQuestion++;
         
         if (this.currentQuestion < questions.length) {
@@ -944,21 +771,9 @@ class EnhancedTestSystem {
         const progressFill = document.getElementById('progress-fill');
         const progressText = document.getElementById('progress-text');
         
-        if (progressFill) {
-            progressFill.style.width = `${progress}%`;
-            
-            // Динамическое изменение цвета прогресса
-            if (progress < 33) {
-                progressFill.style.backgroundColor = '#ff6b6b';
-            } else if (progress < 66) {
-                progressFill.style.backgroundColor = '#ffd93d';
-            } else {
-                progressFill.style.backgroundColor = '#6bcf7f';
-            }
-        }
-        
+        if (progressFill) progressFill.style.width = `${progress}%`;
         if (progressText) {
-            progressText.textContent = `${this.currentQuestion + 1}/${questions.length}`;
+            progressText.textContent = `Вопрос ${this.currentQuestion + 1} из ${questions.length}`;
         }
     }
 
@@ -976,7 +791,7 @@ class EnhancedTestSystem {
         if (nextBtn) nextBtn.style.display = 'none';
         if (prevBtn) prevBtn.style.display = 'none';
         
-        // Рассчитываем и отображаем результаты
+        // Рассчитываем результаты
         this.calculateResults();
     }
 
@@ -984,25 +799,30 @@ class EnhancedTestSystem {
         const questions = this.selectedQuestions;
         let totalScore = 0;
         let maxScore = 0;
-        let correctAnswers = 0;
         
+        // Проходим по всем вопросам
         questions.forEach((question, index) => {
             const userAnswer = this.userAnswers[index];
+            
+            // Максимальный балл за вопрос
             maxScore += question.points || 1;
             
+            // Подсчет баллов
             if (question.type === 'theory') {
+                // Теоретический вопрос
                 const selectedOption = question.options.find(opt => opt.value === userAnswer);
                 if (selectedOption && selectedOption.correct) {
                     totalScore += question.points || 1;
-                    correctAnswers++;
                 }
             } 
             else if (question.type === 'multi') {
+                // Множественный выбор
                 if (!userAnswer || !Array.isArray(userAnswer)) return;
                 
                 let correctCount = 0;
                 const correctOptions = question.options.filter(opt => opt.correct);
                 
+                // Считаем правильные ответы
                 userAnswer.forEach(answer => {
                     const option = question.options.find(opt => opt.value === answer);
                     if (option && option.correct) {
@@ -1010,10 +830,10 @@ class EnhancedTestSystem {
                     }
                 });
                 
+                // Начисляем баллы пропорционально
                 if (correctOptions.length > 0) {
                     const percentage = correctCount / correctOptions.length;
                     totalScore += Math.round((question.points || 1) * percentage);
-                    if (percentage > 0.7) correctAnswers++;
                 }
             }
         });
@@ -1022,210 +842,76 @@ class EnhancedTestSystem {
         this.results = {
             totalScore: totalScore,
             maxScore: maxScore,
-            percentage: Math.round((totalScore / maxScore) * 100),
-            correctAnswers: correctAnswers,
-            totalQuestions: questions.length,
-            averageScore: (totalScore / questions.length).toFixed(1),
-            testType: this.currentTest,
-            date: new Date().toISOString()
+            percentage: Math.round((totalScore / maxScore) * 100)
         };
         
-        // Отображаем улучшенные результаты
-        this.displayEnhancedResults();
+        // Показываем результаты
+        this.displayResults();
         
         // Сохраняем статистику
         this.saveTestStats();
     }
 
-    displayEnhancedResults() {
-        const config = this.progressConfig[this.currentTest];
-        const percentage = this.results.percentage;
-        const score = this.results.totalScore;
+    displayResults() {
+        const totalScoreElement = document.getElementById('total-score');
+        const messageElement = document.getElementById('result-message');
         
-        // Обновляем основную статистику
-        document.getElementById('total-score').textContent = score;
-        document.getElementById('max-score').textContent = config.maxScore;
-        document.getElementById('score-percentage').textContent = `${percentage}%`;
-        
-        // Определяем уровень
-        let level = 'low';
-        let levelColor = '#ff6b6b';
-        
-        if (score >= config.levels.high.min) {
-            level = 'high';
-            levelColor = config.levels.high.color;
-        } else if (score >= config.levels.medium.min) {
-            level = 'medium';
-            levelColor = config.levels.medium.color;
+        if (totalScoreElement) {
+            totalScoreElement.textContent = 
+                `${this.results.totalScore}/${this.results.maxScore} (${this.results.percentage}%)`;
         }
         
-        // Обновляем прогресс-бар результатов
-        const progressFill = document.getElementById('progress-fill-result');
-        const levelIndicator = document.getElementById('level-indicator');
-        const currentLevel = document.getElementById('current-level');
-        
-        if (progressFill) {
-            const fillPercentage = (score / config.maxScore) * 100;
-            progressFill.style.width = `${fillPercentage}%`;
-            progressFill.style.backgroundColor = levelColor;
+        if (messageElement) {
+            messageElement.textContent = this.getResultMessage(this.results.percentage);
         }
         
-        if (levelIndicator) {
-            const position = (score / config.maxScore) * 100;
-            levelIndicator.style.left = `calc(${position}% - 20px)`;
+        // Рекомендации
+        const recommendationsElement = document.getElementById('recommendations');
+        if (recommendationsElement) {
+            recommendationsElement.innerHTML = this.getRecommendations(this.results.percentage);
         }
-        
-        if (currentLevel) {
-            currentLevel.textContent = config.levels[level].label;
-            currentLevel.style.color = levelColor;
-        }
-        
-        // Обновляем детальную статистику
-        document.getElementById('correct-answers').textContent = this.results.correctAnswers;
-        document.getElementById('total-questions').textContent = this.results.totalQuestions;
-        document.getElementById('average-score').textContent = this.results.averageScore;
-        
-        // Обновляем интерпретацию
-        this.updateInterpretation(level, percentage);
-        
-        // Обновляем рекомендации
-        this.updateRecommendations(level);
-        
-        // Обновляем следующие шаги
-        this.updateNextSteps();
     }
 
-    updateInterpretation(level, percentage) {
-        const interpretations = {
-            eq: {
-                high: `🎉 Отличный результат! Ваш эмоциональный интеллект (${percentage}%) находится на высоком уровне. Вы хорошо понимаете свои эмоции и эмоции других людей, эффективно управляете своими реакциями.`,
-                medium: `📊 Хороший результат! Ваш эмоциональный интеллект (${percentage}%) развит на среднем уровне. Есть потенциал для роста в области управления эмоциями в стрессовых ситуациях.`,
-                low: `💪 Есть над чем поработать! Ваш результат (${percentage}%) показывает, что есть возможности для развития эмоционального интеллекта. Это нормально - каждый может улучшить этот навык!`
-            },
-            empathy: {
-                high: `💝 Вы обладаете высоким уровнем эмпатии (${percentage}%)! Вы хорошо чувствуете эмоции других людей и можете поставить себя на их место.`,
-                medium: `🤝 Ваша эмпатия (${percentage}%) развита на среднем уровне. Вы понимаете чувства других, но иногда можете упускать нюансы.`,
-                low: `👂 Результат (${percentage}%) показывает, что есть возможность развить эмпатию. Попробуйте больше слушать и задавать вопросы о чувствах других.`
-            },
-            social: {
-                high: `👑 Отличные социальные навыки (${percentage}%)! Вы легко находите общий язык с людьми и эффективно взаимодействуете в разных ситуациях.`,
-                medium: `🤔 Ваши социальные навыки (${percentage}%) на среднем уровне. Вы справляетесь с общением, но есть области для улучшения.`,
-                low: `🗣️ Результат (${percentage}%) указывает на возможности развития социального интеллекта. Практика общения поможет улучшить этот навык.`
+    getResultMessage(percentage) {
+        if (percentage >= 90) return 'Отличный результат! 🎉';
+        if (percentage >= 70) return 'Хороший результат! 👍';
+        if (percentage >= 50) return 'Средний результат. Есть куда расти 📈';
+        return 'Есть над чем поработать 💪';
+    }
+
+    getRecommendations(percentage) {
+        let recommendations = '<h4>📋 Рекомендации</h4><ul>';
+        
+        if (percentage < 70) {
+            if (this.currentTest === 'eq') {
+                recommendations += `
+                    <li>Ведите дневник эмоций</li>
+                    <li>Практикуйте осознанность</li>
+                    <li>Наблюдайте за своими реакциями</li>
+                `;
+            } else if (this.currentTest === 'empathy') {
+                recommendations += `
+                    <li>Практикуйте активное слушание</li>
+                    <li>Задавайте больше вопросов о чувствах</li>
+                    <li>Читайте художественную литературу</li>
+                `;
+            } else if (this.currentTest === 'social') {
+                recommendations += `
+                    <li>Участвуйте в групповых обсуждениях</li>
+                    <li>Тренируйтесь в публичных выступлениях</li>
+                    <li>Изучайте техники коммуникации</li>
+                `;
             }
-        };
-        
-        const interpretation = interpretations[this.currentTest][level];
-        document.getElementById('result-interpretation').textContent = interpretation;
-    }
-
-    updateRecommendations(level) {
-        const recommendations = {
-            eq: {
-                high: [
-                    { icon: '🏆', text: 'Станьте ментором для других', action: 'mentor' },
-                    { icon: '📈', text: 'Развивайте эмоциональное лидерство', action: 'leadership' },
-                    { icon: '🎯', text: 'Практикуйте сложные эмоциональные ситуации', action: 'practice' }
-                ],
-                medium: [
-                    { icon: '📓', text: 'Ведите дневник эмоций 5 минут в день', action: 'journal' },
-                    { icon: '🧘', text: 'Практикуйте медитацию осознанности', action: 'meditation' },
-                    { icon: '🎭', text: 'Анализируйте эмоции героев фильмов/книг', action: 'analysis' },
-                    { icon: '⏰', text: 'Установите напоминание для практики', action: 'reminder' }
-                ],
-                low: [
-                    { icon: '🔍', text: 'Начните замечать свои эмоции в течение дня', action: 'observation' },
-                    { icon: '🎯', text: 'Выполняйте одно упражнение в день', action: 'practice' },
-                    { icon: '📚', text: 'Прочитайте книгу об эмоциональном интеллекте', action: 'resources' },
-                    { icon: '👥', text: 'Обсудите свои чувства с близким человеком', action: 'discussion' }
-                ]
-            },
-            empathy: {
-                high: [
-                    { icon: '🤝', text: 'Помогайте другим развивать эмпатию', action: 'help' },
-                    { icon: '🎭', text: 'Участвуйте в волонтерских проектах', action: 'volunteer' },
-                    { icon: '📖', text: 'Читайте сложную психологическую литературу', action: 'reading' }
-                ],
-                medium: [
-                    { icon: '👂', text: 'Практикуйте активное слушание', action: 'listening' },
-                    { icon: '❓', text: 'Задавайте больше вопросов "Что ты чувствуешь?"', action: 'questions' },
-                    { icon: '🎬', text: 'Анализируйте фильмы с точки зрения эмоций героев', action: 'analysis' }
-                ],
-                low: [
-                    { icon: '👁️', text: 'Наблюдайте за невербальными сигналами людей', action: 'observation' },
-                    { icon: '💭', text: 'Представляйте себя на месте другого человека', action: 'imagination' },
-                    { icon: '📝', text: 'Записывайте свои наблюдения о чувствах других', action: 'journal' }
-                ]
-            },
-            social: {
-                high: [
-                    { icon: '🌟', text: 'Развивайте навыки публичных выступлений', action: 'speaking' },
-                    { icon: '🤝', text: 'Участвуйте в переговорах повышенной сложности', action: 'negotiation' },
-                    { icon: '👥', text: 'Организуйте социальные мероприятия', action: 'organization' }
-                ],
-                medium: [
-                    { icon: '💬', text: 'Практикуйте разговор с новыми людьми', action: 'conversation' },
-                    { icon: '🎯', text: 'Участвуйте в групповых обсуждениях', action: 'discussion' },
-                    { icon: '📊', text: 'Анализируйте успешные коммуникации', action: 'analysis' }
-                ],
-                low: [
-                    { icon: '👋', text: 'Начинайте с малого - приветствуйте людей первым', action: 'greeting' },
-                    { icon: '🎭', text: 'Пробуйте разные роли в общении', action: 'roles' },
-                    { icon: '📚', text: 'Изучайте базовые техники коммуникации', action: 'resources' }
-                ]
-            }
-        };
-        
-        const recs = recommendations[this.currentTest][level];
-        const container = document.getElementById('detailed-recommendations');
-        
-        container.innerHTML = recs.map(rec => `
-            <div class="recommendation-item">
-                <div class="recommendation-icon">${rec.icon}</div>
-                <div class="recommendation-content">
-                    <div class="recommendation-text">${rec.text}</div>
-                    <button class="recommendation-action" data-action="${rec.action}">
-                        Начать
-                    </button>
-                </div>
-            </div>
-        `).join('');
-    }
-
-    updateNextSteps() {
-        const nextTests = {
-            eq: ['empathy', 'social'],
-            empathy: ['eq', 'social'],
-            social: ['eq', 'empathy']
-        };
-        
-        const remainingTests = nextTests[this.currentTest];
-        const steps = [
-            'Пройдите другие тесты для полной картины',
-            'Регулярно практикуйте рекомендации',
-            'Отслеживайте прогресс через неделю',
-            'Делитесь результатами с друзьями'
-        ];
-        
-        const container = document.getElementById('next-steps-list');
-        container.innerHTML = steps.map((step, index) => `
-            <div class="step-item ${index === 0 ? 'next-test' : ''}">
-                <input type="checkbox" id="step${index + 1}" ${index === 0 ? 'data-test="' + remainingTests[0] + '"' : ''}>
-                <label for="step${index + 1}">${step}</label>
-            </div>
-        `).join('');
-        
-        // Добавляем обработчик для перехода к следующему тесту
-        const nextTestCheckbox = document.querySelector('.next-test input');
-        if (nextTestCheckbox) {
-            nextTestCheckbox.addEventListener('change', (e) => {
-                if (e.target.checked) {
-                    const testType = e.target.dataset.test;
-                    this.selectTest(testType);
-                    document.querySelector('.tests-selection').style.display = 'block';
-                    document.getElementById('test-results').style.display = 'none';
-                }
-            });
+        } else {
+            recommendations += `
+                <li>Продолжайте развивать свои навыки</li>
+                <li>Помогайте другим в развитии</li>
+                <li>Ищите новые вызовы для себя</li>
+            `;
         }
+        
+        recommendations += '</ul>';
+        return recommendations;
     }
 
     saveTestStats() {
@@ -1235,31 +921,23 @@ class EnhancedTestSystem {
             stats[this.currentTest] = [];
         }
         
-        stats[this.currentTest].push({
-            date: this.results.date,
+        const testResult = {
+            date: new Date().toISOString(),
             score: this.results.totalScore,
             maxScore: this.results.maxScore,
             percentage: this.results.percentage,
-            level: this.getCurrentLevel(),
             testType: this.currentTest
-        });
+        };
         
-        // Сохраняем последние 10 результатов
-        if (stats[this.currentTest].length > 10) {
-            stats[this.currentTest] = stats[this.currentTest].slice(-10);
+        stats[this.currentTest].push(testResult);
+        
+        // Сохраняем только последние 5 результатов
+        if (stats[this.currentTest].length > 5) {
+            stats[this.currentTest] = stats[this.currentTest].slice(-5);
         }
         
         localStorage.setItem('testStats', JSON.stringify(stats));
         this.updateTestStats();
-    }
-
-    getCurrentLevel() {
-        const config = this.progressConfig[this.currentTest];
-        const score = this.results.totalScore;
-        
-        if (score >= config.levels.high.min) return 'high';
-        if (score >= config.levels.medium.min) return 'medium';
-        return 'low';
     }
 
     loadTestStats() {
@@ -1271,71 +949,83 @@ class EnhancedTestSystem {
         
         let totalTests = 0;
         let lastTest = '-';
-        let progress = 0;
         
         Object.keys(stats).forEach(testType => {
             totalTests += stats[testType].length;
+            
             if (stats[testType].length > 0) {
                 const last = stats[testType][stats[testType].length - 1];
                 const lastDate = new Date(last.date).toLocaleDateString('ru-RU');
-                lastTest = lastDate;
-            }
-        });
-        
-        // Прогресс по всем тестам (максимум 3 теста)
-        const completedTests = Object.keys(stats).length;
-        progress = Math.min(100, Math.round((completedTests / 3) * 100));
-        
-        // Обновляем элементы статистики
-        ['total-tests', 'last-test', 'progress'].forEach(id => {
-            const element = document.getElementById(id);
-            if (element) {
-                switch(id) {
-                    case 'total-tests': element.textContent = totalTests; break;
-                    case 'last-test': element.textContent = lastTest; break;
-                    case 'progress': element.textContent = `${progress}%`; break;
+                if (lastTest === '-' || new Date(last.date) > new Date(lastTest)) {
+                    lastTest = lastDate;
                 }
             }
         });
+        
+        const totalTestsElement = document.getElementById('total-tests');
+        const lastTestElement = document.getElementById('last-test');
+        
+        if (totalTestsElement) totalTestsElement.textContent = totalTests;
+        if (lastTestElement) lastTestElement.textContent = lastTest;
+        
+        // Считаем средний процент по EQ
+        let eqTotal = 0;
+        let eqCount = 0;
+        if (stats.eq && stats.eq.length > 0) {
+            stats.eq.forEach(result => {
+                eqTotal += result.percentage;
+                eqCount++;
+            });
+        }
+        
+        const avgEqElement = document.getElementById('avg-eq');
+        if (avgEqElement) {
+            avgEqElement.textContent = eqCount > 0 ? Math.round(eqTotal / eqCount) + '%' : '-';
+        }
+        
+        // Прогресс
+        const progressElement = document.getElementById('progress');
+        if (progressElement) {
+            const totalPossibleTests = 3; // eq + empathy + social
+            const progress = Math.min(100, Math.round((totalTests / totalPossibleTests) * 33.3));
+            progressElement.textContent = progress + '%';
+        }
     }
 
     saveResultsToJournal() {
         const testName = {
-            eq: 'Тест на эмоциональный интеллект',
+            eq: 'EQ тест',
             empathy: 'Тест на эмпатию',
             social: 'Тест на социальный интеллект'
         }[this.currentTest];
         
-        const level = this.getCurrentLevel();
-        const levelEmoji = { high: '🏆', medium: '📊', low: '💪' }[level];
-        
-        const entry = {
-            id: Date.now(),
-            date: new Date().toISOString(),
-            mood: this.getMoodFromScore(this.results.percentage),
-            moodText: this.getMoodText(this.results.percentage),
-            notes: `${levelEmoji} Результат "${testName}": ${this.results.totalScore}/${this.results.maxScore} баллов (${this.results.percentage}%)\n\n` +
-                   `Уровень: ${this.getCurrentLevel()}\n` +
-                   `Правильных ответов: ${this.results.correctAnswers}/${this.results.totalQuestions}`,
-            activities: ['тест', this.currentTest, level],
-            tags: ['тест', 'результат', 'развитие'],
-            createdAt: new Date().toISOString()
-        };
-        
-        // Сохраняем в localStorage
-        const entries = JSON.parse(localStorage.getItem('moodJournalEntries') || '[]');
-        entries.unshift(entry);
-        localStorage.setItem('moodJournalEntries', JSON.stringify(entries));
-        
-        alert('✅ Результат сохранён в дневник!');
-    }
-
-    getMoodFromScore(percentage) {
-        if (percentage >= 80) return 5;
-        if (percentage >= 60) return 4;
-        if (percentage >= 40) return 3;
-        if (percentage >= 20) return 2;
-        return 1;
+        if (!window.moodJournal) {
+            // Сохраняем в localStorage
+            const entries = JSON.parse(localStorage.getItem('moodJournalEntries') || '[]');
+            const entry = {
+                id: Date.now(),
+                date: new Date().toISOString(),
+                mood: Math.max(1, Math.min(5, Math.round(this.results.percentage / 20))),
+                moodText: this.getMoodText(this.results.percentage),
+                notes: `Результат ${testName}: ${this.results.totalScore}/${this.results.maxScore} баллов (${this.results.percentage}%)`,
+                activities: ['тест', this.currentTest],
+                tags: ['тест', 'психология', 'результат'],
+                createdAt: new Date().toISOString()
+            };
+            
+            entries.unshift(entry);
+            localStorage.setItem('moodJournalEntries', JSON.stringify(entries));
+            alert('Результат сохранён в дневник!');
+        } else {
+            window.moodJournal.addEntry({
+                mood: Math.max(1, Math.min(5, Math.round(this.results.percentage / 20))),
+                moodText: this.getMoodText(this.results.percentage),
+                notes: `Результат ${testName}: ${this.results.totalScore}/${this.results.maxScore} баллов (${this.results.percentage}%)`,
+                activities: ['тест', this.currentTest],
+                tags: ['тест', 'психология', 'результат']
+            });
+            alert('Результат сохранён в дневник!');
+        }
     }
 
     getMoodText(percentage) {
@@ -1347,43 +1037,29 @@ class EnhancedTestSystem {
     }
 
     retakeTest() {
-        this.testInProgress = false;
-        this.testCompleted = false;
-        this.currentQuestion = 0;
-        this.userAnswers = [];
-        this.selectedQuestions = [];
-        
-        document.getElementById('test-results').style.display = 'none';
-        document.getElementById('test-container').style.display = 'block';
-        document.getElementById('current-test').style.display = 'block';
-        document.getElementById('next-question').style.display = 'block';
-        
-        document.querySelector('.test-description').style.display = 'none';
-        document.querySelector('.tests-selection').style.display = 'none';
-        
-        this.startTest();
-    }
-
-    shareResults() {
-        const text = `🎯 Я прошел тест на ${this.currentTest === 'eq' ? 'эмоциональный интеллект' : 
-                     this.currentTest === 'empathy' ? 'эмпатию' : 'социальный интеллект'} и набрал ` +
-                    `${this.results.totalScore}/${this.results.maxScore} баллов (${this.results.percentage}%)! ` +
-                    `Уровень: ${this.getCurrentLevel()}. Попробуйте и вы!`;
-        
-        if (navigator.share) {
-            navigator.share({
-                title: 'Мои результаты теста',
-                text: text,
-                url: window.location.href
-            });
-        } else {
-            navigator.clipboard.writeText(text);
-            alert('📋 Результаты скопированы в буфер обмена!');
-        }
-    }
+    // Полностью сбрасываем состояние
+    this.testInProgress = false;
+    this.testCompleted = false;
+    this.currentQuestion = 0;
+    this.userAnswers = [];
+    this.selectedQuestions = [];
+    
+    // Скрываем результаты, показываем контейнер теста
+    document.getElementById('test-results').style.display = 'none';
+    document.getElementById('test-container').style.display = 'block';
+    document.getElementById('current-test').style.display = 'block';
+    document.getElementById('next-question').style.display = 'block';
+    
+    // Прячем описание теста и выбор теста (если они еще видны)
+    document.querySelector('.test-description').style.display = 'none';
+    document.querySelector('.tests-selection').style.display = 'none';
+    
+    // Запускаем тест заново
+    this.startTest();
+}
 }
 
-// Инициализация при загрузке страницы
+// Инициализация
 document.addEventListener('DOMContentLoaded', () => {
-    window.testSystem = new EnhancedTestSystem();
+    window.testSystem = new SimpleTestSystem();
 });

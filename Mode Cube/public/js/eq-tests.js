@@ -130,35 +130,28 @@ class TestSystem {
         } else if (question.type === 'practice') {
             // Практические вопросы с вводом ответов
             questionHTML += `
-                <div class="practice-question">
-                    <p class="practice-scenario">${question.scenario}</p>
-                    <div class="practice-instructions">
-                        <p><strong>Задание:</strong> ${question.instruction}</p>
-                        <p class="hint">${question.hint || 'Введите свои ответы через запятую или с новой строки'}</p>
-                    </div>
-                    
+                <div class="practice-section">
+                    <!-- Основной ввод -->
                     <div class="practice-input-container">
-                        <textarea 
-                            id="practice-input" 
-                            placeholder="${question.placeholder || 'Введите ответы...'}" 
-                            rows="4"
-                        ></textarea>
+                        <textarea id="practice-input" ...></textarea>
                         
-                        <!-- Автоподсказки (скрыты изначально) -->
+                        <!-- Подсказки появляются прямо под textarea -->
                         <div class="autocomplete-hints" id="autocomplete-hints" style="display: none;">
                             <p class="hint-title">Возможные варианты:</p>
                             <div class="hint-list"></div>
                         </div>
                     </div>
                     
-                    <!-- Кнопка для добавления варианта -->
-                    <div class="add-hint-container">
+                    <!-- Список выбранных вариантов -->
+                    <div class="selected-hints-container">
+                        <div class="selected-hints" id="selected-hints"></div>
+                    </div>
+                    
+                    <!-- Добавление своих вариантов (после выбранных) -->
+                    <div class="custom-hint-container">
                         <input type="text" id="add-hint-input" placeholder="Добавить свой вариант...">
                         <button id="add-hint-btn" class="nav-btn">+ Добавить</button>
                     </div>
-                    
-                    <!-- Выбранные варианты -->
-                    <div class="selected-hints" id="selected-hints"></div>
                 </div>
             `;
         } else if (question.type === 'multi') {
@@ -1035,4 +1028,5 @@ function shuffleOptions(question) {
     }
     return question;
 }
+
 

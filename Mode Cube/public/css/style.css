@@ -1579,3 +1579,96 @@ h3 {
     margin-top: 10px;
 }
 
+/* Дополнение к стилям для тестов */
+.emotions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 10px;
+    margin: 20px 0;
+}
+
+.emotion-btn {
+    padding: 12px 15px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.9rem;
+    text-align: center;
+}
+
+.emotion-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.emotion-btn.selected {
+    background: rgba(0, 219, 222, 0.3);
+    border-color: #00dbde;
+    transform: scale(1.05);
+}
+
+.selected-emotions {
+    margin: 20px 0;
+    padding: 15px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+}
+
+.selected-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.selected-emotion {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    background: rgba(0, 219, 222, 0.2);
+    border: 1px solid rgba(0, 219, 222, 0.5);
+    border-radius: 20px;
+    font-size: 0.9rem;
+}
+
+.remove-emotion {
+    background: rgba(255, 100, 100, 0.3);
+    border: none;
+    color: #ff6464;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.remove-emotion:hover {
+    background: rgba(255, 100, 100, 0.5);
+    transform: scale(1.1);
+}
+
+.practice-instruction {
+    color: #a0e0ff;
+    font-size: 1rem;
+    margin-bottom: 15px;
+    line-height: 1.5;
+}
+
+/* Адаптивность для эмоций */
+@media (max-width: 768px) {
+    .emotions-grid {
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    }
+    
+    .emotion-btn {
+        padding: 10px;
+        font-size: 0.85rem;
+    }
+}

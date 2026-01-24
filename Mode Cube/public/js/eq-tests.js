@@ -21,6 +21,7 @@ class SimpleTestSystem {
         this.loadQuestions();
         this.setupEventListeners();
         this.loadTestStats();
+        this.autoSelectFirstTest();
     }
 
     loadQuestions() {
@@ -518,16 +519,39 @@ class SimpleTestSystem {
 }
 
     setupEventListeners() {
-        // Выбор теста
+    const testCategories = document.querySelector('.test-categories');
+    
+    if (!testCategories) {
+        console.warn('Элемент .test-categories не найден!');
+        return;
+    }
+    
+    // Используем стрелочную функцию, чтобы сохранить контекст this
+    testCategories.addEventListener('click', (e) => {
+        // Ищем ближайшую кнопку, начиная от элемента, по которому кликнули
+        const button = e.target.closest('.test-category-btn');
+        
+        if (!button) return; // Клик был не по кнопке
+        
+        // Получаем тип теста из data-атрибута
+        const testType = button.dataset.test;
+        
+        if (!testType) {
+            console.warn('У кнопки нет data-test атрибута!');
+            return;
+        }
+        
+        // Снимаем активный класс со всех кнопок
         document.querySelectorAll('.test-category-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                document.querySelectorAll('.test-category-btn').forEach(b => {
-                    b.classList.remove('active');
-                });
-                e.target.classList.add('active');
-                this.selectTest(e.target.dataset.test);
-            });
+            btn.classList.remove('active');
         });
+        
+        // Добавляем активный класс нажатой кнопке
+        button.classList.add('active');
+        
+        // Вызываем метод selectTest с правильным контекстом
+        this.selectTest(testType);
+    });
 
         // Кнопка начала теста
         const startBtn = document.getElementById('start-test');
@@ -1089,5 +1113,6 @@ class SimpleTestSystem {
 document.addEventListener('DOMContentLoaded', () => {
     window.testSystem = new SimpleTestSystem();
 });
+
 
 

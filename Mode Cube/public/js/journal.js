@@ -383,7 +383,54 @@ class MoodJournal {
         
         // Текущая серия (дни подряд с записями)
         this.elements.currentStreak.textContent = this.calculateStreak() + ' дней';
+
+        this.displayPatternInsights();
     }
+
+    displayPatternInsights() {
+    const patterns = this.analyzeEntryPatterns();
+    if (!patterns || patterns.length === 0) return;
+    
+    let insightsHTML = '<h4 style="margin-bottom: 15px; color: #00dbde;">🔍 Авто-анализ закономерностей</h4>';
+    
+    patterns.forEach(pattern => {
+        insightsHTML += `
+            <div class="pattern-insight ${pattern.type}">
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 5px;">
+                    <span style="font-size: 1.2rem;">${pattern.icon}</span>
+                    <strong style="color: ${pattern.type === 'warning' ? '#ff6464' : '#4CAF50'}">
+                        ${pattern.text}
+                    </strong>
+                </div>
+                <div style="color: #a0a0c0; font-size: 0.9rem; margin-left: 34px;">
+                    ${pattern.details}
+                </div>
+            </div>
+        `;
+    });
+    
+    // Находим или создаем контейнер
+    let insightsContainer = document.getElementById('pattern-insights');
+    if (!insightsContainer) {
+        insightsContainer = document.createElement('div');
+        insightsContainer.id = 'pattern-insights';
+        insightsContainer.style.cssText = `
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 20px;
+            border-left: 4px solid #00dbde;
+        `;
+        
+        // Вставляем после статистики
+        const statsContainer = document.querySelector('.journal-controls');
+        if (statsContainer) {
+            statsContainer.appendChild(insightsContainer);
+        }
+    }
+    
+    insightsContainer.innerHTML = insightsHTML;
+}
 
     // Рассчитать серию дней подряд
     calculateStreak() {
@@ -607,6 +654,90 @@ class MoodJournal {
             </div>
         `).join('');
     }
+
+    analyzeEntryPatterns() {
+    if (this.entries.length < 3) return null;
+    
+    const lastWeekEntries = this.getEntriesFromLastDays(7);
+    if (lastWeekEntries.length < 3) return null;
+    
+    const insights = [];
+    
+    // 1. Среднее настроение за неделю
+    const avgMoodWeek = lastWeekEntries.reduce((sum, entry) => sum + entry.mood, 0) / lastWeekEntries.length;
+    
+    // 2. Низкое настроение 3 дня подряд
+    let lowMoodStreak = 0;
+    let maxLowMoodStreak = 0;
+    
+    // Сортируем по дате
+    const sortedEntries = [...lastWeekEntries].sort((a, b) => new Date(a.date) - new Date(b.date));
+    
+    for (let i = 0; i < sortedEntries.length; i++) {
+        if (sortedEntries[i].mood < 2.5) {
+            lowMoodStreak++;
+            maxLowMoodStreak = Math.max(maxLowMoodStreak, lowMoodStreak);
+        } else {
+            lowMoodStreak = 0;
+        }
+    }
+    
+    if (maxLowMoodStreak >= 3) {
+        insights.push({
+            type: 'warning',
+            icon: '⚠️',
+            text: `Обнаружена серия из ${maxLowMoodStreak} дней с низким настроением подряд`,
+            details: 'Это может указывать на накопленный стресс. Рекомендуется отдых и расслабление.'
+        });
+    }
+    
+    // 3. Сравнение с предыдущими днями
+    if (sortedEntries.length >= 2) {
+        const lastEntry = sortedEntries[sortedEntries.length - 1];
+        const prevEntry = sortedEntries[sortedEntries.length - 2];
+        
+        if (lastEntry.mood < prevEntry.mood - 1) {
+            insights.push({
+                type: 'warning',
+                icon: '📉',
+                text: 'Резкое падение настроения',
+                details: `С ${prevEntry.mood.toFixed(1)} до ${lastEntry.mood.toFixed(1)}. Возможно, нужна смена деятельности.`
+            });
+        } else if (lastEntry.mood > prevEntry.mood + 1) {
+            insights.push({
+                type: 'positive',
+                icon: '📈',
+                text: 'Значительное улучшение настроения',
+                details: 'Отличный прогресс! Продолжайте в том же духе.'
+            });
+        }
+    }
+    
+    // 4. Низкая энергия
+    const lowEnergyEntries = lastWeekEntries.filter(entry => entry.energy && entry.energy < 2);
+    if (lowEnergyEntries.length >= 3) {
+        insights.push({
+            type: 'warning',
+            icon: '⚡',
+            text: 'Несколько дней низкой энергии',
+            details: `${lowEnergyEntries.length} из ${lastWeekEntries.length} дней. Проверьте режим сна и питания.`
+        });
+    }
+    
+    // 5. Высокий стресс
+    const highStressEntries = lastWeekEntries.filter(entry => entry.stress && entry.stress > 4);
+    if (highStressEntries.length >= 2) {
+        insights.push({
+            type: 'warning',
+            icon: '💥',
+            text: 'Периоды высокого стресса',
+            details: `Заметили ${highStressEntries.length} дня с высоким уровнем стресса. Рекомендуем техники релаксации.`
+        });
+    }
+    
+    return insights;
+}
+
 
     // Найти лучший день недели
     findBestDayOfWeek() {

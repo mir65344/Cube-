@@ -9,9 +9,9 @@ class SimpleTestSystem {
         this.selectedQuestions = [];
 
         this.questionLimit = {
-            eq: 12,      // Брать 12 случайных вопросов из базы
-            empathy: 7,  // Брать 7 случайных вопросов
-            social: 7    // Брать 7 случайных вопросов
+            eq: 10,      // Брать 12 случайных вопросов из базы
+            empathy: 10,  // Брать 7 случайных вопросов
+            social: 10    // Брать 7 случайных вопросов
         };
         
         this.init();
@@ -1240,6 +1240,7 @@ class SimpleTestSystem {
 document.addEventListener('DOMContentLoaded', () => {
     window.testSystem = new SimpleTestSystem();
 });
+
 
 
 

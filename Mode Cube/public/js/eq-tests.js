@@ -9,9 +9,9 @@ class SimpleTestSystem {
         this.selectedQuestions = [];
 
         this.questionLimit = {
-            eq: 10,      // Брать 10 случайных вопросов из базы
-            empathy: 5,  // Брать 5 случайных вопросов
-            social: 5    // Брать 5 случайных вопросов
+            eq: 12,      // Брать 12 случайных вопросов из базы
+            empathy: 7,  // Брать 7 случайных вопросов
+            social: 7    // Брать 7 случайных вопросов
         };
         
         this.init();
@@ -247,7 +247,67 @@ class SimpleTestSystem {
             ].sort(() => Math.random() - 0.5),
             points: 3
         }
+
+                {
+            type: 'theory',
+            text: 'Как вы реагируете на неожиданные перемены в жизни?',
+            options: [
+                { text: 'Паникую и сопротивляюсь изменениям', value: '1', correct: false },
+                { text: 'Принимаю с трудом, но постепенно адаптируюсь', value: '2', correct: false },
+                { text: 'Воспринимаю как новый опыт и возможность роста', value: '3', correct: true }
+            ].sort(() => Math.random() - 0.5),
+            points: 3
+        },
+        {
+            type: 'theory',
+            text: 'Когда вы чувствуете себя перегруженным, как вы действуете?',
+            options: [
+                { text: 'Продолжаю работать через силу, пока не упаду', value: '1', correct: false },
+                { text: 'Стараюсь игнорировать усталость', value: '2', correct: false },
+                { text: 'Осознаю свои пределы и даю себе отдых', value: '3', correct: true }
+            ].sort(() => Math.random() - 0.5),
+            points: 3
+        },
+        {
+            type: 'theory',
+            text: 'Как вы относитесь к своим сильным сторонам?',
+            options: [
+                { text: 'Стесняюсь их и стараюсь не выделяться', value: '1', correct: false },
+                { text: 'Использую их, но не придаю особого значения', value: '2', correct: false },
+                { text: 'Признаю и ценю их, развиваю дальше', value: '3', correct: true }
+            ].sort(() => Math.random() - 0.5),
+            points: 3
+        },
+        {
+            type: 'multi',
+            text: 'Какие из этих утверждений о эмоциях верны? (выберите до 3)',
+            options: [
+                { text: 'Эмоции мешают рациональному мышлению', value: 'мешают', correct: false },
+                { text: 'Все эмоции важны и имеют значение', value: 'важны', correct: true },
+                { text: 'Сильные эмоции нужно подавлять', value: 'подавлять', correct: false },
+                { text: 'Эмоции дают ценную информацию о потребностях', value: 'информация', correct: true },
+                { text: 'Только позитивные эмоции полезны', value: 'позитивные', correct: false },
+                { text: 'Навык управления эмоциями можно развивать', value: 'развивать', correct: true }
+            ].sort(() => Math.random() - 0.5),
+            points: 3,
+            maxChoices: 3
+        },
+        {
+            type: 'multi',
+            text: 'Что помогает вам восстанавливать эмоциональный баланс? (выберите до 3)',
+            options: [
+                { text: 'Чрезмерная самокритика', value: 'самокритика', correct: false },
+                { text: 'Практика благодарности', value: 'благодарность', correct: true },
+                { text: 'Прогулки на природе', value: 'природа', correct: true },
+                { text: 'Изоляция от всех', value: 'изоляция', correct: false },
+                { text: 'Общение с поддерживающими людьми', value: 'общение', correct: true },
+                { text: 'Игнорирование усталости', value: 'игнорирование', correct: false }
+            ].sort(() => Math.random() - 0.5),
+            points: 3,
+            maxChoices: 3
+        }
     ];
+        
 
     // База вопросов для эмпатии (10 вопросов)
     this.allQuestions.empathy = [
@@ -361,6 +421,40 @@ class SimpleTestSystem {
                 { text: 'Считаете их неправильными', value: '1', correct: false }
             ].sort(() => Math.random() - 0.5),
             points: 3
+        }
+        {
+            type: 'theory',
+            text: 'Когда вы общаетесь с человеком другой культуры, вы:',
+            options: [
+                { text: 'Стараюсь понять его точку зрения и особенности', value: '3', correct: true },
+                { text: 'Оцениваю его через призму своих ценностей', value: '2', correct: false },
+                { text: 'Избегаю глубокого общения из-за различий', value: '1', correct: false }
+            ].sort(() => Math.random() - 0.5),
+            points: 3
+        },
+        {
+            type: 'theory',
+            text: 'Если вы видите, что кто-то радуется чему-то, что вам не нравится, вы:',
+            options: [
+                { text: 'Могу разделить их радость, даже если не понимаю причину', value: '3', correct: true },
+                { text: 'Вежливо улыбаюсь, но внутри не понимаю', value: '2', correct: false },
+                { text: 'Сразу говорю, что не разделяю их восторг', value: '1', correct: false }
+            ].sort(() => Math.random() - 0.5),
+            points: 3
+        },
+        {
+            type: 'multi',
+            text: 'Какие признаки показывают, что человек нуждается в поддержке? (выберите до 3)',
+            options: [
+                { text: 'Изменение тона голоса', value: 'тон', correct: true },
+                { text: 'Избегание зрительного контакта', value: 'взгляд', correct: true },
+                { text: 'Чрезмерная веселость', value: 'веселость', correct: false },
+                { text: 'Необычная молчаливость', value: 'молчание', correct: true },
+                { text: 'Обычное поведение без изменений', value: 'обычное', correct: false },
+                { text: 'Излишняя самокритика', value: 'самокритика', correct: true }
+            ].sort(() => Math.random() - 0.5),
+            points: 3,
+            maxChoices: 3
         }
     ];
 
@@ -477,6 +571,40 @@ class SimpleTestSystem {
                 { text: 'Чувствую себя не в своей тарелке', value: '1', correct: false }
             ].sort(() => Math.random() - 0.5),
             points: 3
+        }
+        {
+            type: 'theory',
+            text: 'Как вы ведете себя, когда нужно выразить несогласие с авторитетным лицом?',
+            options: [
+                { text: 'Высказываю свое мнение уважительно и аргументированно', value: '3', correct: true },
+                { text: 'Молчу, чтобы не создавать конфликт', value: '2', correct: false },
+                { text: 'Говорю резко, защищая свою позицию', value: '1', correct: false }
+            ].sort(() => Math.random() - 0.5),
+            points: 3
+        },
+        {
+            type: 'theory',
+            text: 'Когда вы замечаете, что в разговоре доминируете, вы:',
+            options: [
+                { text: 'Сознательно даю слово другим, задаю вопросы', value: '3', correct: true },
+                { text: 'Продолжаю говорить, раз уж начал', value: '2', correct: false },
+                { text: 'Не замечаю этого и продолжаю', value: '1', correct: false }
+            ].sort(() => Math.random() - 0.5),
+            points: 3
+        },
+        {
+            type: 'multi',
+            text: 'Что важно для построения долгосрочных отношений? (выберите до 3)',
+            options: [
+                { text: 'Честность и открытость', value: 'честность', correct: true },
+                { text: 'Постоянный контроль друга', value: 'контроль', correct: false },
+                { text: 'Умение прощать ошибки', value: 'прощение', correct: true },
+                { text: 'Полное совпадение интересов', value: 'совпадение', correct: false },
+                { text: 'Взаимное уважение границ', value: 'границы', correct: true },
+                { text: 'Ежедневное общение', value: 'ежедневно', correct: false }
+            ].sort(() => Math.random() - 0.5),
+            points: 3,
+            maxChoices: 3
         }
     ];
 }
@@ -1113,6 +1241,7 @@ class SimpleTestSystem {
 document.addEventListener('DOMContentLoaded', () => {
     window.testSystem = new SimpleTestSystem();
 });
+
 
 
 

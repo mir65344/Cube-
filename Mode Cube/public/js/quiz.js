@@ -7,6 +7,8 @@ const options = document.querySelectorAll('.option');
 // переменные для хранения ответов пользователя
 let userAnswers = {};
 let testCompleted = false;
+let currentScore = 0;
+let currentMoodLevel = 0;
 
 // обработчики выбора ответов
 options.forEach(option => {
@@ -54,52 +56,49 @@ submitBtn.addEventListener('click', function() {
     }
     
     // рассчитываем результат
-    const score = calculateScore();
-    const moodLevel = calculateMoodLevel(score);
+    currentScore = calculateScore();
+    currentMoodLevel = calculateMoodLevel(currentScore);
     
     // показываем результат
-    showResult(score, moodLevel);
+    showResult(currentScore, currentMoodLevel);
     
     // подсвечиваем ответы пользователя
     highlightAnswers();
     
     // обновляем цвет куба
     if (window.cubeController) {
-        window.cubeController.updateCubeColor(moodLevel);
+        window.cubeController.updateCubeColor(currentMoodLevel);
     }
     
-    // обновляем статистику
-    updateStats(score, moodLevel);
+    // обновляем статистику и показываем умные подсказки
+    updateStats(currentScore, currentMoodLevel);
+    addSmartInsights(currentScore, currentMoodLevel);
     
     testCompleted = true;
     submitBtn.disabled = true;
     submitBtn.textContent = 'Тест завершен';
 });
 
-// расчет общего балла - ПРАВИЛЬНАЯ ВЕРСИЯ
+// расчет общего балла
 function calculateScore() {
     let totalScore = 0;
     const totalQuestions = Object.keys(userAnswers).length;
     
     for (let i = 1; i <= totalQuestions; i++) {
-        // значения от 1 до 4, где 1 - лучший, 4 - худший
-        // преобразуем в шкалу 1-5 где 5 - лучший результат
         const answerValue = userAnswers[i];
         let convertedScore;
 
-        // оптимизация через switch case вместо else if
         switch(answerValue) {
-            case 1: convertedScore = 5; break; // Отлично
-            case 2: convertedScore = 4; break; // Хорошо
-            case 3: convertedScore = 2; break; // Немного устал/тревожно
-            case 4: convertedScore = 1; break; // Плохо
-            default: convertedScore = 3; // По умолчанию
+            case 1: convertedScore = 5; break;
+            case 2: convertedScore = 4; break;
+            case 3: convertedScore = 2; break;
+            case 4: convertedScore = 1; break;
+            default: convertedScore = 3;
         }
         
         totalScore += convertedScore;
     }
     
-    // средний балл от 1 до 5
     const averageScore = totalScore / totalQuestions;
     return Math.min(Math.max(averageScore, 1), 5);
 }
@@ -123,7 +122,7 @@ function showResult(score, moodLevel) {
     showRecommendations(moodLevel);
 }
 
-// Добавить кнопку сохранения в дневник
+// Кнопка сохранения в дневник
 const saveToJournalBtn = document.createElement('button');
 saveToJournalBtn.textContent = '💾 Сохранить в дневник';
 saveToJournalBtn.className = 'submit-btn';
@@ -131,9 +130,8 @@ saveToJournalBtn.style.marginTop = '10px';
 saveToJournalBtn.style.backgroundColor = '#4CAF50';
 
 saveToJournalBtn.addEventListener('click', () => {
-    // Проверяем, есть ли функция сохранения в дневник
     if (typeof saveTestToJournal === 'function') {
-        saveTestToJournal(score, getMoodText(moodLevel), userAnswers);
+        saveTestToJournal(currentScore, getMoodText(currentMoodLevel), userAnswers);
         saveToJournalBtn.disabled = true;
         saveToJournalBtn.textContent = '✅ Сохранено в дневник';
         saveToJournalBtn.style.backgroundColor = '#666';
@@ -154,7 +152,7 @@ function getMoodText(moodLevel) {
     return 'Плохое 😞';
 }
 
-// подсветка ответов разными цветами
+// подсветка ответов
 function highlightAnswers() {
     document.querySelectorAll('.question').forEach((question, index) => {
         const questionNumber = index + 1;
@@ -163,13 +161,9 @@ function highlightAnswers() {
         question.querySelectorAll('.option').forEach(option => {
             const optionValue = parseInt(option.getAttribute('data-value'));
             
-            // сбрасываем предыдущие классы
             option.classList.remove('selected', 'answer-1', 'answer-2', 'answer-3', 'answer-4', 'user-selected');
-            
-            // добавляем цвет в зависимости от значения ответа
             option.classList.add(`answer-${optionValue}`);
             
-            // помечаем ответ пользователя
             if (optionValue === userAnswer) {
                 option.classList.add('user-selected');
             }
@@ -226,6 +220,93 @@ function showRecommendations(moodLevel) {
     
     recommendationsDiv.innerHTML = recommendations;
     recommendationsDiv.style.display = 'block';
+}
+
+// УМНЫЕ ПОДСКАЗКИ - НОВАЯ ФУНКЦИЯ
+function addSmartInsights(score, moodLevel) {
+    const existingData = JSON.parse(localStorage.getItem('moodTests') || '[]');
+    const totalTests = existingData.length + 1; // + текущий тест
+    
+    const insightsContainer = document.createElement('div');
+    insightsContainer.className = 'smart-insights';
+    insightsContainer.style.cssText = `
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 15px;
+        padding: 20px;
+        margin-top: 20px;
+        border-left: 4px solid #00dbde;
+        animation: fadeIn 0.5s ease;
+    `;
+    
+    let insightHTML = '<strong>🤖 Умные подсказки:</strong><br><br>';
+    
+    // Анализ текущего результата
+    if (score < 2) {
+        insightHTML += '<div class="insight-badge warning">⚠️ Критически низкое настроение</div><br>';
+        insightHTML += 'Рекомендуем срочно отдохнуть и обратиться за поддержкой к близким или специалисту.<br><br>';
+    } 
+    else if (score < 2.5) {
+        insightHTML += '<div class="insight-badge warning">📉 Низкое настроение</div><br>';
+        insightHTML += 'Попробуйте прогулку, любимую музыку или хобби. Может помочь разговор с другом.<br><br>';
+    }
+    else if (score < 3) {
+        insightHTML += '<div class="insight-badge info">🤔 Среднее настроение</div><br>';
+        insightHTML += 'Всё в норме, но есть куда расти! Попробуйте небольшие улучшения в ежедневных привычках.<br><br>';
+    }
+    else if (score >= 4) {
+        insightHTML += '<div class="insight-badge positive">🌟 Отличное настроение!</div><br>';
+        insightHTML += 'Поделитесь позитивом с другими! Хорошее настроение заразительно.<br><br>';
+    }
+    
+    // Анализ истории (если есть предыдущие тесты)
+    if (existingData.length >= 2) {
+        const lastThreeTests = existingData.slice(-2); // берем 2 предыдущих + текущий будет 3
+        const testDates = lastThreeTests.map(test => new Date(test.date).toLocaleDateString('ru-RU'));
+        
+        // Проверяем 3 дня подряд низкого настроения
+        const lowMoodTests = lastThreeTests.filter(test => test.score < 2.5);
+        
+        if (lowMoodTests.length >= 2 && score < 2.5) {
+            insightHTML += '<div class="insight-badge warning">⏳ Уже несколько дней низкое настроение</div><br>';
+            insightHTML += `Заметили тенденцию: ${testDates.join(', ')}. Это может быть признаком накопленного стресса.<br><br>`;
+        }
+        
+        // Проверяем улучшение
+        if (existingData.length >= 1) {
+            const lastScore = existingData[existingData.length - 1].score;
+            const improvement = score - lastScore;
+            
+            if (improvement > 0.5) {
+                insightHTML += '<div class="insight-badge positive">📈 Настроение улучшается!</div><br>';
+                insightHTML += `+${improvement.toFixed(1)} балла с последнего теста. Так держать!<br><br>`;
+            } 
+            else if (improvement < -0.5) {
+                insightHTML += '<div class="insight-badge warning">📉 Настроение ухудшается</div><br>';
+                insightHTML += `-${Math.abs(improvement).toFixed(1)} балла. Возможно, нужен отдых или смена деятельности.<br><br>`;
+            }
+        }
+    }
+    
+    // Если это первый тест
+    if (existingData.length === 0) {
+        insightHTML += '<div class="insight-badge info">📝 Первая запись</div><br>';
+        insightHTML += 'Рекомендуем проходить тест регулярно, чтобы отслеживать динамику настроения.<br><br>';
+    }
+    
+    // Общая статистика
+    insightHTML += `<small><i>Всего тестов: ${totalTests}. Записывайте настроение регулярно для лучшего анализа.</i></small>`;
+    
+    insightsContainer.innerHTML = insightHTML;
+    
+    // Вставляем после статистики
+    const statsContainer = document.querySelector('.user-stats');
+    if (statsContainer) {
+        // Удаляем старые подсказки, если есть
+        const oldInsights = statsContainer.querySelector('.smart-insights');
+        if (oldInsights) oldInsights.remove();
+        
+        statsContainer.appendChild(insightsContainer);
+    }
 }
 
 // обновление статистики
@@ -303,4 +384,3 @@ function loadTestHistory() {
         }
     }
 }
-

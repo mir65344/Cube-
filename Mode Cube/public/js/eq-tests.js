@@ -246,9 +246,8 @@ class SimpleTestSystem {
                 { text: 'Считаю, что это эгоизм', value: '1', correct: false }
             ].sort(() => Math.random() - 0.5),
             points: 3
-        }
-
-                {
+        },
+        {
             type: 'theory',
             text: 'Как вы реагируете на неожиданные перемены в жизни?',
             options: [
@@ -421,7 +420,7 @@ class SimpleTestSystem {
                 { text: 'Считаете их неправильными', value: '1', correct: false }
             ].sort(() => Math.random() - 0.5),
             points: 3
-        }
+        },
         {
             type: 'theory',
             text: 'Когда вы общаетесь с человеком другой культуры, вы:',
@@ -571,7 +570,7 @@ class SimpleTestSystem {
                 { text: 'Чувствую себя не в своей тарелке', value: '1', correct: false }
             ].sort(() => Math.random() - 0.5),
             points: 3
-        }
+        },
         {
             type: 'theory',
             text: 'Как вы ведете себя, когда нужно выразить несогласие с авторитетным лицом?',
@@ -1241,6 +1240,7 @@ class SimpleTestSystem {
 document.addEventListener('DOMContentLoaded', () => {
     window.testSystem = new SimpleTestSystem();
 });
+
 
 
 

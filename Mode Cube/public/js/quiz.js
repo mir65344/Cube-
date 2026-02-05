@@ -136,7 +136,7 @@ saveToJournalBtn.addEventListener('click', () => {
         saveToJournalBtn.textContent = '✅ Сохранено в дневник';
         saveToJournalBtn.style.backgroundColor = '#666';
     } else {
-        alert('Функция дневника недоступна. Перейдите на страницу дневника.');
+        alert('Дневник еще не активирован, создайте первую запись вручную!');
     }
 });
 
@@ -384,3 +384,4 @@ function loadTestHistory() {
         }
     }
 }
+

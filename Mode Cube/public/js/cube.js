@@ -1,4 +1,4 @@
-// ''элементы DOM для движения
+// элементы DOM для движения
 const cube = document.getElementById('cube');
 const rotateXBtn = document.getElementById('rotateX');
 const rotateYBtn = document.getElementById('rotateY');
@@ -20,27 +20,32 @@ const moodColors = {
     1: { // очень плохое настроение
         primary: '#663366',
         secondary: '#330033',
-        gradient: 'linear-gradient(135deg, #663366 0%, #330033 100%)'
+        gradient: 'linear-gradient(135deg, #663366 0%, #330033 100%)',
+        background: 'rgba(102, 51, 102, 0.1)'
     },
     2: { // плохое настроение
         primary: '#ff6666',
         secondary: '#cc3366',
-        gradient: 'linear-gradient(135deg, #ff6666 0%, #cc3366 100%)'
+        gradient: 'linear-gradient(135deg, #ff6666 0%, #cc3366 100%)',
+        background: 'rgba(255, 102, 102, 0.1)'
     },
     3: { // нормальное настроение (нейтральный начальный)
         primary: '#a0a0ff',
         secondary: '#8080ff',
-        gradient: 'linear-gradient(135deg, #a0a0ff 0%, #8080ff 100%)'
+        gradient: 'linear-gradient(135deg, #a0a0ff 0%, #8080ff 100%)',
+        background: 'rgba(160, 160, 255, 0.1)'
     },
     4: { // хорошее настроение
         primary: '#ffcc00',
         secondary: '#ff6600',
-        gradient: 'linear-gradient(135deg, #ffcc00 0%, #ff6600 100%)'
+        gradient: 'linear-gradient(135deg, #ffcc00 0%, #ff6600 100%)',
+        background: 'rgba(255, 204, 0, 0.1)'
     },
     5: { // отличное настроение
         primary: '#00ff88',
         secondary: '#0088ff',
-        gradient: 'linear-gradient(135deg, #00ff88 0%, #0088ff 100%)'
+        gradient: 'linear-gradient(135deg, #00ff88 0%, #0088ff 100%)',
+        background: 'rgba(0, 255, 136, 0.1)'
     }
 };
 
@@ -86,6 +91,39 @@ function createMoodGradient(moodLevel) {
     return `linear-gradient(135deg, ${mixedColor} 0%, ${mixColors(moodColors[baseLevel].secondary, moodColors[nextLevel].secondary, blendFactor)} 100%)`;
 }
 
+// функция для создания фонового цвета на основе настроения
+function createBackgroundColor(moodLevel) {
+    const baseLevel = Math.floor(moodLevel);
+    const nextLevel = Math.min(baseLevel + 1, 5);
+    const blendFactor = moodLevel - baseLevel;
+
+    if (blendFactor === 0 || nextLevel > 5) {
+        return moodColors[baseLevel].background;
+    }
+
+    // Парсим rgba цвета для смешивания
+    function parseRgba(rgba) {
+        const matches = rgba.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*[\d.]+)?\)/);
+        if (matches) {
+            return {
+                r: parseInt(matches[1]),
+                g: parseInt(matches[2]),
+                b: parseInt(matches[3])
+            };
+        }
+        return { r: 0, g: 0, b: 0 };
+    }
+
+    const baseRgb = parseRgba(moodColors[baseLevel].background);
+    const nextRgb = parseRgba(moodColors[nextLevel].background);
+
+    const r = Math.round(baseRgb.r * (1 - blendFactor) + nextRgb.r * blendFactor);
+    const g = Math.round(baseRgb.g * (1 - blendFactor) + nextRgb.g * blendFactor);
+    const b = Math.round(baseRgb.b * (1 - blendFactor) + nextRgb.b * blendFactor);
+
+    return `rgba(${r}, ${g}, ${b}, 0.15)`;
+}
+
 // функция обновления цвета куба на основе настроения
 function updateCubeColor(moodLevel) {
     const gradient = createMoodGradient(moodLevel);
@@ -102,7 +140,27 @@ function updateCubeColor(moodLevel) {
         `;
     });
 
+    // Обновляем фон сайта
+    updateBackgroundColor(moodLevel);
+
     saveCubeColor(gradient, moodLevel);
+}
+
+// функция обновления фона сайта
+function updateBackgroundColor(moodLevel) {
+    const backgroundColor = createBackgroundColor(moodLevel);
+    const body = document.body;
+    
+    body.style.transition = 'background-color 1.5s ease';
+    body.style.backgroundColor = backgroundColor;
+    
+    // Добавляем легкий градиент для фона
+    const baseColor = moodColors[Math.round(moodLevel)].primary;
+    body.style.background = `radial-gradient(circle at 50% 50%, ${backgroundColor}, rgba(0, 0, 0, 0.8))`;
+    
+    // Сохраняем цвет фона
+    localStorage.setItem('backgroundColor', backgroundColor);
+    localStorage.setItem('backgroundMoodLevel', moodLevel);
 }
 
 // функция обновления вращения
@@ -110,11 +168,13 @@ function updateCubeRotation() {
     cube.style.transform = `rotateX(${rotation.x}deg) rotateY(${rotation.y}deg) rotateZ(${rotation.z}deg)`;
 }
 
-// загрузка сохраненного цвета куба
+// загрузка сохраненного цвета куба и фона
 function loadCubeColor() {
     try {
         const savedColor = localStorage.getItem('cubeColor');
         const savedScore = localStorage.getItem('moodScore');
+        const savedBackground = localStorage.getItem('backgroundColor');
+        const savedBackgroundLevel = localStorage.getItem('backgroundMoodLevel');
         
         if (savedColor && savedScore) {
             const faces = document.querySelectorAll('.face');
@@ -122,6 +182,14 @@ function loadCubeColor() {
                 face.style.background = savedColor;
             });
         }
+        
+        // Загружаем сохраненный фон
+        if (savedBackground && savedBackgroundLevel) {
+            document.body.style.backgroundColor = savedBackground;
+            const baseColor = moodColors[Math.round(parseFloat(savedBackgroundLevel))].primary;
+            document.body.style.background = `radial-gradient(circle at 50% 50%, ${savedBackground}, rgba(0, 0, 0, 0.8))`;
+        }
+        
         // если нет сохраненного цвета куб остается с нейтральным цветом по умолчанию
     } catch (error) {
         console.log('Цвет куба не загружен');
@@ -212,7 +280,7 @@ if (cube) {
     cube.style.cursor = 'grab';
 }
 
-// сохранение цвета куба
+// сохранение цвета куба и фона
 function saveCubeColor(color, score) {
     try {
         localStorage.setItem('cubeColor', color);
@@ -227,11 +295,19 @@ function saveCubeColor(color, score) {
 document.addEventListener('DOMContentLoaded', () => {
     loadCubeColor();
     updateCubeRotation();
+    
+    // Устанавливаем начальный фон, если нет сохраненного
+    if (!localStorage.getItem('backgroundColor')) {
+        document.body.style.backgroundColor = 'rgba(0, 0, 0, 0.9)';
+        document.body.style.background = 'radial-gradient(circle at 50% 50%, rgba(0, 0, 0, 0.9), #000000)';
+    }
 });
 
 // экспортируем функции для использования в других файлах
 window.cubeController = {
     updateCubeColor,
+    updateBackgroundColor,
     mixColors,
-    createMoodGradient
+    createMoodGradient,
+    createBackgroundColor
 };

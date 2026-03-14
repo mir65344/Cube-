@@ -21,31 +21,31 @@ const moodColors = {
         primary: '#663366',
         secondary: '#330033',
         gradient: 'linear-gradient(135deg, #663366 0%, #330033 100%)',
-        background: 'rgba(102, 51, 102, 0.1)'
+        glow: 'rgba(102, 51, 102, 0.3)'
     },
     2: { // плохое настроение
         primary: '#ff6666',
         secondary: '#cc3366',
         gradient: 'linear-gradient(135deg, #ff6666 0%, #cc3366 100%)',
-        background: 'rgba(255, 102, 102, 0.1)'
+        glow: 'rgba(255, 102, 102, 0.3)'
     },
     3: { // нормальное настроение (нейтральный начальный)
         primary: '#a0a0ff',
         secondary: '#8080ff',
         gradient: 'linear-gradient(135deg, #a0a0ff 0%, #8080ff 100%)',
-        background: 'rgba(160, 160, 255, 0.1)'
+        glow: 'rgba(160, 160, 255, 0.3)'
     },
     4: { // хорошее настроение
         primary: '#ffcc00',
         secondary: '#ff6600',
         gradient: 'linear-gradient(135deg, #ffcc00 0%, #ff6600 100%)',
-        background: 'rgba(255, 204, 0, 0.1)'
+        glow: 'rgba(255, 204, 0, 0.3)'
     },
     5: { // отличное настроение
         primary: '#00ff88',
         secondary: '#0088ff',
         gradient: 'linear-gradient(135deg, #00ff88 0%, #0088ff 100%)',
-        background: 'rgba(0, 255, 136, 0.1)'
+        glow: 'rgba(0, 255, 136, 0.3)'
     }
 };
 
@@ -91,14 +91,14 @@ function createMoodGradient(moodLevel) {
     return `linear-gradient(135deg, ${mixedColor} 0%, ${mixColors(moodColors[baseLevel].secondary, moodColors[nextLevel].secondary, blendFactor)} 100%)`;
 }
 
-// функция для создания фонового цвета на основе настроения
-function createBackgroundColor(moodLevel) {
+// функция для создания эффекта свечения на основе настроения
+function createGlowEffect(moodLevel) {
     const baseLevel = Math.floor(moodLevel);
     const nextLevel = Math.min(baseLevel + 1, 5);
     const blendFactor = moodLevel - baseLevel;
 
     if (blendFactor === 0 || nextLevel > 5) {
-        return moodColors[baseLevel].background;
+        return moodColors[baseLevel].glow;
     }
 
     // Парсим rgba цвета для смешивания
@@ -114,14 +114,14 @@ function createBackgroundColor(moodLevel) {
         return { r: 0, g: 0, b: 0 };
     }
 
-    const baseRgb = parseRgba(moodColors[baseLevel].background);
-    const nextRgb = parseRgba(moodColors[nextLevel].background);
+    const baseRgb = parseRgba(moodColors[baseLevel].glow);
+    const nextRgb = parseRgba(moodColors[nextLevel].glow);
 
     const r = Math.round(baseRgb.r * (1 - blendFactor) + nextRgb.r * blendFactor);
     const g = Math.round(baseRgb.g * (1 - blendFactor) + nextRgb.g * blendFactor);
     const b = Math.round(baseRgb.b * (1 - blendFactor) + nextRgb.b * blendFactor);
 
-    return `rgba(${r}, ${g}, ${b}, 0.15)`;
+    return `rgba(${r}, ${g}, ${b}, 0.2)`;
 }
 
 // функция обновления цвета куба на основе настроения
@@ -140,27 +140,50 @@ function updateCubeColor(moodLevel) {
         `;
     });
 
-    // Обновляем фон сайта
-    updateBackgroundColor(moodLevel);
+    // Обновляем фоновое свечение
+    updateBackgroundGlow(moodLevel);
 
     saveCubeColor(gradient, moodLevel);
 }
 
-// функция обновления фона сайта
-function updateBackgroundColor(moodLevel) {
-    const backgroundColor = createBackgroundColor(moodLevel);
+// функция обновления фонового свечения (не влияет на текст)
+function updateBackgroundGlow(moodLevel) {
+    const glowColor = createGlowEffect(moodLevel);
     const body = document.body;
     
-    body.style.transition = 'background-color 1.5s ease';
-    body.style.backgroundColor = backgroundColor;
+    // Создаем или обновляем элемент для фонового свечения
+    let glowElement = document.getElementById('background-glow');
     
-    // Добавляем легкий градиент для фона
-    const baseColor = moodColors[Math.round(moodLevel)].primary;
-    body.style.background = `radial-gradient(circle at 50% 50%, ${backgroundColor}, rgba(0, 0, 0, 0.8))`;
+    if (!glowElement) {
+        glowElement = document.createElement('div');
+        glowElement.id = 'background-glow';
+        glowElement.style.position = 'fixed';
+        glowElement.style.top = '0';
+        glowElement.style.left = '0';
+        glowElement.style.width = '100%';
+        glowElement.style.height = '100%';
+        glowElement.style.pointerEvents = 'none'; // Чтобы не мешать кликам
+        glowElement.style.zIndex = '-1'; // Помещаем под весь контент
+        glowElement.style.transition = 'background 1.5s ease';
+        document.body.appendChild(glowElement);
+    }
     
-    // Сохраняем цвет фона
-    localStorage.setItem('backgroundColor', backgroundColor);
-    localStorage.setItem('backgroundMoodLevel', moodLevel);
+    // Устанавливаем градиентное свечение по краям, оставляя центр темным
+    glowElement.style.background = `
+        radial-gradient(circle at 50% 50%, 
+            transparent 30%, 
+            ${glowColor} 80%,
+            rgba(0, 0, 0, 0.9) 100%
+        )
+    `;
+    
+    // Основной фон страницы оставляем темным для контраста с текстом
+    body.style.backgroundColor = '#0a0a0a';
+    body.style.backgroundImage = 'none';
+    
+    // Сохраняем настройки
+    localStorage.setItem('glowColor', glowColor);
+    localStorage.setItem('glowMoodLevel', moodLevel);
 }
 
 // функция обновления вращения
@@ -168,13 +191,13 @@ function updateCubeRotation() {
     cube.style.transform = `rotateX(${rotation.x}deg) rotateY(${rotation.y}deg) rotateZ(${rotation.z}deg)`;
 }
 
-// загрузка сохраненного цвета куба и фона
+// загрузка сохраненного цвета куба и свечения
 function loadCubeColor() {
     try {
         const savedColor = localStorage.getItem('cubeColor');
         const savedScore = localStorage.getItem('moodScore');
-        const savedBackground = localStorage.getItem('backgroundColor');
-        const savedBackgroundLevel = localStorage.getItem('backgroundMoodLevel');
+        const savedGlow = localStorage.getItem('glowColor');
+        const savedGlowLevel = localStorage.getItem('glowMoodLevel');
         
         if (savedColor && savedScore) {
             const faces = document.querySelectorAll('.face');
@@ -183,11 +206,30 @@ function loadCubeColor() {
             });
         }
         
-        // Загружаем сохраненный фон
-        if (savedBackground && savedBackgroundLevel) {
-            document.body.style.backgroundColor = savedBackground;
-            const baseColor = moodColors[Math.round(parseFloat(savedBackgroundLevel))].primary;
-            document.body.style.background = `radial-gradient(circle at 50% 50%, ${savedBackground}, rgba(0, 0, 0, 0.8))`;
+        // Загружаем сохраненное свечение
+        if (savedGlow && savedGlowLevel) {
+            let glowElement = document.getElementById('background-glow');
+            if (!glowElement) {
+                glowElement = document.createElement('div');
+                glowElement.id = 'background-glow';
+                glowElement.style.position = 'fixed';
+                glowElement.style.top = '0';
+                glowElement.style.left = '0';
+                glowElement.style.width = '100%';
+                glowElement.style.height = '100%';
+                glowElement.style.pointerEvents = 'none';
+                glowElement.style.zIndex = '-1';
+                glowElement.style.transition = 'background 1.5s ease';
+                document.body.appendChild(glowElement);
+            }
+            
+            glowElement.style.background = `
+                radial-gradient(circle at 50% 50%, 
+                    transparent 30%, 
+                    ${savedGlow} 80%,
+                    rgba(0, 0, 0, 0.9) 100%
+                )
+            `;
         }
         
         // если нет сохраненного цвета куб остается с нейтральным цветом по умолчанию
@@ -280,7 +322,7 @@ if (cube) {
     cube.style.cursor = 'grab';
 }
 
-// сохранение цвета куба и фона
+// сохранение цвета куба и свечения
 function saveCubeColor(color, score) {
     try {
         localStorage.setItem('cubeColor', color);
@@ -293,21 +335,36 @@ function saveCubeColor(color, score) {
 
 // загрузка при старте
 document.addEventListener('DOMContentLoaded', () => {
+    // Устанавливаем базовый темный фон
+    document.body.style.backgroundColor = '#0a0a0a';
+    document.body.style.margin = '0';
+    document.body.style.minHeight = '100vh';
+    document.body.style.color = '#ffffff'; // Белый текст для контраста
+    
     loadCubeColor();
     updateCubeRotation();
     
-    // Устанавливаем начальный фон, если нет сохраненного
-    if (!localStorage.getItem('backgroundColor')) {
-        document.body.style.backgroundColor = 'rgba(0, 0, 0, 0.9)';
-        document.body.style.background = 'radial-gradient(circle at 50% 50%, rgba(0, 0, 0, 0.9), #000000)';
+    // Создаем базовое свечение, если его нет
+    if (!document.getElementById('background-glow')) {
+        const glowElement = document.createElement('div');
+        glowElement.id = 'background-glow';
+        glowElement.style.position = 'fixed';
+        glowElement.style.top = '0';
+        glowElement.style.left = '0';
+        glowElement.style.width = '100%';
+        glowElement.style.height = '100%';
+        glowElement.style.pointerEvents = 'none';
+        glowElement.style.zIndex = '-1';
+        glowElement.style.background = 'radial-gradient(circle at 50% 50%, transparent 30%, rgba(160, 160, 255, 0.1) 80%, rgba(0, 0, 0, 0.9) 100%)';
+        document.body.appendChild(glowElement);
     }
 });
 
 // экспортируем функции для использования в других файлах
 window.cubeController = {
     updateCubeColor,
-    updateBackgroundColor,
+    updateBackgroundGlow,
     mixColors,
     createMoodGradient,
-    createBackgroundColor
+    createGlowEffect
 };

@@ -446,10 +446,6 @@
 }
     </style>
     <script>
-        /**
- * 📖 ДНЕВНИК НАСТРОЕНИЯ - полный функционал в одном файле
- * Оптимизированная и структурированная реализация
- */
 
 class MoodJournal {
     constructor() {
@@ -468,7 +464,7 @@ class MoodJournal {
     }
 
     /**
-     * ИНИЦИАЛИЗАЦИЯ
+      ИНИЦИАЛИЗАЦИЯ
      */
     init() {
         this.cacheElements();
@@ -486,7 +482,7 @@ class MoodJournal {
     }
 
     /**
-     * КЭШИРОВАНИЕ ЭЛЕМЕНТОВ DOM
+      КЭШИРОВАНИЕ ЭЛЕМЕНТОВ DOM
      */
     cacheElements() {
         this.elements = {
@@ -520,11 +516,9 @@ class MoodJournal {
         };
     }
 
-    /**
-     * ПРИВЯЗКА СОБЫТИЙ
+    /** ПРИВЯЗКА СОБЫТИЙ
      */
     bindEvents() {
-        // Быстрая запись
         this.elements.saveQuickBtn.addEventListener('click', () => this.saveQuickEntry());
         this.elements.moodOptions.forEach(option => {
             option.addEventListener('click', (e) => this.selectMoodOption(e.target));
@@ -542,7 +536,7 @@ class MoodJournal {
         this.elements.moodFilter.addEventListener('change', () => this.renderEntries());
         this.elements.exportBtn.addEventListener('click', () => this.exportData());
 
-        // График
+        // график
         this.elements.chartControls.forEach(btn => {
             btn.addEventListener('click', (e) => {
                 this.elements.chartControls.forEach(b => b.classList.remove('active'));
@@ -552,7 +546,7 @@ class MoodJournal {
             });
         });
 
-        // Быстрые клавиши
+        // юыстрые клавиши
         document.addEventListener('keydown', (e) => {
             if (e.ctrlKey && e.key === 's') {
                 e.preventDefault();
@@ -565,7 +559,6 @@ class MoodJournal {
      * РАБОТА С ХРАНИЛИЩЕМ
      */
     
-    // Загрузить все записи
     loadEntries() {
         try {
             const data = localStorage.getItem(this.STORAGE_KEY);
@@ -604,7 +597,7 @@ class MoodJournal {
             createdAt: new Date().toISOString()
         };
 
-        this.entries.unshift(entry); // Добавляем в начало
+        this.entries.unshift(entry);
         this.saveEntries();
         this.renderEntries();
         this.updateStats();
@@ -614,7 +607,7 @@ class MoodJournal {
         return entry;
     }
 
-    // Удалить запись
+    // удалить запись
     deleteEntry(id) {
         if (confirm('Удалить эту запись?')) {
             this.entries = this.entries.filter(entry => entry.id !== id);
@@ -630,7 +623,6 @@ class MoodJournal {
      * РЕНДЕРИНГ ИНТЕРФЕЙСА
      */
 
-    // Отобразить записи
     renderEntries() {
         const filteredEntries = this.filterEntries();
         
@@ -646,7 +638,7 @@ class MoodJournal {
 
         let html = '<h3>📅 История записей</h3>';
         
-        // Группировка по дням
+        // гоуппировка по дням
         const groupedEntries = this.groupEntriesByDay(filteredEntries);
         
         Object.keys(groupedEntries).sort().reverse().forEach(date => {
@@ -664,7 +656,7 @@ class MoodJournal {
         });
     }
 
-    // Отфильтровать записи
+    // отфильтровать записи
     filterEntries() {
         let filtered = [...this.entries];
 
@@ -703,7 +695,7 @@ class MoodJournal {
                 break;
         }
 
-        // Фильтр по настроению
+        // фильтр по настроению
         const moodFilter = this.elements.moodFilter.value;
         if (moodFilter !== 'all') {
             filtered = filtered.filter(entry => 
@@ -714,7 +706,7 @@ class MoodJournal {
         return filtered;
     }
 
-    // Группировать записи по дням
+    // группировать записи по дням
     groupEntriesByDay(entries) {
         return entries.reduce((groups, entry) => {
             const date = new Date(entry.date).toLocaleDateString('ru-RU', {
@@ -730,7 +722,7 @@ class MoodJournal {
         }, {});
     }
 
-    // Отобразить секцию дня
+    // отобразить секцию дня
     renderDaySection(date, dayEntries) {
         const avgMood = dayEntries.reduce((sum, entry) => sum + entry.mood, 0) / dayEntries.length;
         const moodEmoji = this.getMoodEmoji(avgMood);
@@ -748,7 +740,7 @@ class MoodJournal {
         `;
     }
 
-    // Отобразить одну запись
+    // отобразить одну запись
     renderEntry(entry) {
         const date = new Date(entry.date);
         const time = date.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
@@ -783,7 +775,6 @@ class MoodJournal {
      * СТАТИСТИКА И АНАЛИТИКА
      */
 
-    // Обновить статистику
     updateStats() {
         if (this.entries.length === 0) {
             this.elements.totalEntries.textContent = '0';
@@ -809,11 +800,9 @@ class MoodJournal {
         });
         this.elements.bestDay.textContent = `${bestDate} (${bestEntry.mood.toFixed(1)})`;
         
-        // Текущая серия (дни подряд с записями)
         this.elements.currentStreak.textContent = this.calculateStreak() + ' дней';
     }
 
-    // Рассчитать серию дней подряд
     calculateStreak() {
         if (this.entries.length === 0) return 0;
         
@@ -839,7 +828,7 @@ class MoodJournal {
         return streak;
     }
 
-    // Проверить, идут ли дни подряд
+    // проверка на последовательность дней
     isConsecutiveDays(date1, date2) {
         const d1 = new Date(date1);
         const d2 = new Date(date2);
@@ -847,7 +836,6 @@ class MoodJournal {
         return diff <= 1;
     }
 
-    // Получить предыдущий день
     getPreviousDay(date) {
         const d = new Date(date);
         d.setDate(d.getDate() - 1);
@@ -858,7 +846,7 @@ class MoodJournal {
      * ГРАФИК НАСТРОЕНИЯ
      */
 
-    // Инициализировать график
+    // инит. график
     initChart() {
         const ctx = this.elements.moodChart.getContext('2d');
         
@@ -918,7 +906,6 @@ class MoodJournal {
             return;
         }
         
-        // Подготовка данных
         const labels = filteredEntries.map(entry => 
             new Date(entry.date).toLocaleDateString('ru-RU', { 
                 month: 'short', 
@@ -928,13 +915,13 @@ class MoodJournal {
         
         const data = filteredEntries.map(entry => entry.mood);
         
-        // Обновление графика
+        // обновление графика
         this.moodChart.data.labels = labels;
         this.moodChart.data.datasets[0].data = data;
         this.moodChart.update();
     }
 
-    // Отфильтровать записи для графика
+    // отфильтровать записи для графика
     filterEntriesForChart() {
         let filtered = [...this.entries];
         
@@ -948,7 +935,7 @@ class MoodJournal {
             );
         }
         
-        // Ограничиваем количество точек на графике
+        // ограничиваем количество точек на графике
         if (filtered.length > 30) {
             const step = Math.ceil(filtered.length / 30);
             filtered = filtered.filter((_, index) => index % step === 0);
@@ -958,7 +945,7 @@ class MoodJournal {
     }
 
     /**
-     * ИНСАЙТЫ И АНАЛИЗ
+      ИНСАЙТЫ И АНАЛИЗ
      */
 
     // Сгенерировать инсайты
@@ -998,7 +985,6 @@ class MoodJournal {
             }
         }
         
-        // Лучшие дни недели
         const bestDay = this.findBestDayOfWeek();
         if (bestDay) {
             insights.push({
@@ -1008,7 +994,6 @@ class MoodJournal {
             });
         }
         
-        // Серия записей
         const streak = this.calculateStreak();
         if (streak >= 3) {
             insights.push({
@@ -1018,7 +1003,6 @@ class MoodJournal {
             });
         }
         
-        // Если нет инсайтов
         if (insights.length === 0) {
             insights.push({
                 type: 'info',
@@ -1027,7 +1011,7 @@ class MoodJournal {
             });
         }
         
-        // Отображаем инсайты
+        // отображаем инсайты
         this.elements.insightsList.innerHTML = insights.map(insight => `
             <div class="insight ${insight.type}">
                 <div class="insight-icon">${insight.icon}</div>
@@ -1036,7 +1020,7 @@ class MoodJournal {
         `).join('');
     }
 
-    // Найти лучший день недели
+    // на йти лучший день недели
     findBestDayOfWeek() {
         if (this.entries.length < 7) return null;
         
@@ -1052,7 +1036,7 @@ class MoodJournal {
             dayStats[day].count++;
         });
         
-        // Находим день с максимальным средним
+        // находим день с максимальным средним
         let bestDay = null;
         let bestAvg = 0;
         
@@ -1070,7 +1054,7 @@ class MoodJournal {
         return bestDay;
     }
 
-    // Получить записи за последние N дней
+    // получить записи за последние N дней
     getEntriesFromLastDays(days) {
         const cutoffDate = new Date();
         cutoffDate.setDate(cutoffDate.getDate() - days);
@@ -1083,7 +1067,7 @@ class MoodJournal {
      * ФОРМЫ И ВВОД ДАННЫХ
      */
 
-    // Сохранить быструю запись
+    // сохранить быструю запись
     saveQuickEntry() {
         const selectedMood = document.querySelector('.mood-option.selected');
         if (!selectedMood) {
@@ -1105,7 +1089,7 @@ class MoodJournal {
         
         this.addEntry(entryData);
         
-        // Сброс формы
+        // сброс формы
         this.elements.quickNote.value = '';
         document.querySelectorAll('.quick-tags .tag.selected').forEach(tag => {
             tag.classList.remove('selected');
@@ -1115,7 +1099,7 @@ class MoodJournal {
         this.showNotification('Запись сохранена!', 'success');
     }
 
-    // Выбрать настроение в быстрой форме
+    // быстрая форма настроения
     selectMoodOption(element) {
         document.querySelectorAll('.mood-option').forEach(opt => {
             opt.classList.remove('selected');
@@ -1123,7 +1107,6 @@ class MoodJournal {
         element.classList.add('selected');
     }
 
-    // Выбрать/отменить тег
     toggleTag(element) {
         element.classList.toggle('selected');
     }
@@ -1132,7 +1115,6 @@ class MoodJournal {
      * ЭКСПОРТ ДАННЫХ
      */
 
-    // Экспортировать данные
     exportData() {
         const data = {
             exportedAt: new Date().toISOString(),
@@ -1155,7 +1137,6 @@ class MoodJournal {
      * УТИЛИТЫ
      */
 
-    // Получить текстовое описание настроения
     getMoodText(moodValue) {
         const mood = parseFloat(moodValue);
         if (mood >= 4.5) return 'Отличное';
@@ -1165,7 +1146,6 @@ class MoodJournal {
         return 'Плохое';
     }
 
-    // Получить emoji для настроения
     getMoodEmoji(moodValue) {
         const mood = parseFloat(moodValue);
         if (mood >= 4.5) return '😄';
@@ -1175,7 +1155,7 @@ class MoodJournal {
         return '😢';
     }
 
-    // Получить сообщение при отсутствии записей
+    // прлучить сообщение при отсутствии записей
     getNoEntriesMessage() {
         switch (this.currentFilter) {
             case 'today': return 'Сегодня ещё нет записей';
@@ -1185,13 +1165,12 @@ class MoodJournal {
         }
     }
 
-    // Показать уведомление
+    // показать уведомление
     showNotification(message, type = 'info') {
-        // Удаляем старое уведомление
+
         const oldNotification = document.querySelector('.journal-notification');
         if (oldNotification) oldNotification.remove();
         
-        // Создаем новое
         const notification = document.createElement('div');
         notification.className = `journal-notification ${type}`;
         notification.textContent = message;
@@ -1209,7 +1188,7 @@ class MoodJournal {
         
         document.body.appendChild(notification);
         
-        // Автоматическое скрытие
+        // автоматическое скрытие
         setTimeout(() => {
             notification.style.animation = 'slideOut 0.3s ease';
             setTimeout(() => notification.remove(), 300);
@@ -1217,17 +1196,16 @@ class MoodJournal {
     }
 }
 
-// Инициализация при загрузке страницы
+// инициализация при загрузке страницы
 document.addEventListener('DOMContentLoaded', () => {
-    // Проверяем, находимся ли мы на странице дневника
     if (document.querySelector('.journal-container')) {
         window.moodJournal = new MoodJournal();
     }
 });
 
 /**
- * Функция для интеграции с quiz.js
- * Сохранить результат теста в дневник
+  функция для интеграции с quiz.js
+ сххранить результат теста в дневник
  */
 function saveTestToJournal(score, moodText, answers) {
     if (!window.moodJournal) {
@@ -1253,7 +1231,7 @@ function saveTestToJournal(score, moodText, answers) {
         
         alert('Результат теста сохранён в дневник!');
     } else {
-        // Используем существующий журнал
+        // используем существующий журнал
         window.moodJournal.addEntry({
             mood: score,
             moodText: moodText,
@@ -1352,10 +1330,10 @@ function saveTestToJournal(score, moodText, answers) {
                 <div class="no-entries" id="no-entries">
                     <p>Пока нет записей. Добавьте первую!</p>
                 </div>
-                <!-- записи будут добавляться сюда через JavaScript -->
+                <!-- записи будут добавляться сюда через JavaScript, не нужно ничего писать!!! -->
             </div>
 
-            <!-- График настроения -->
+            <!-- график настроения -->
             <div class="mood-chart card">
                 <h3>📈 График настроения</h3>
                 <div class="chart-container">

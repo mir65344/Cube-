@@ -1108,7 +1108,7 @@ class SimpleTestSystem {
         
         stats[this.currentTest].push(testResult);
         
-        // Сохраняем только последние 5 результатов
+        // сохраняем только последние 5 результатов
         if (stats[this.currentTest].length > 5) {
             stats[this.currentTest] = stats[this.currentTest].slice(-5);
         }
@@ -1160,7 +1160,7 @@ class SimpleTestSystem {
             avgEqElement.textContent = eqCount > 0 ? Math.round(eqTotal / eqCount) + '%' : '-';
         }
         
-        // Прогресс
+        // ПРогресс
         const progressElement = document.getElementById('progress');
         if (progressElement) {
             const totalPossibleTests = 3; // eq + empathy + social
@@ -1231,12 +1231,11 @@ class SimpleTestSystem {
     document.querySelector('.test-description').style.display = 'none';
     document.querySelector('.tests-selection').style.display = 'none';
     
-    // Запускаем тест заново
+    // запускаем тест заново
     this.startTest();
 }
 }
 
-// Инициализация
 document.addEventListener('DOMContentLoaded', () => {
     window.testSystem = new SimpleTestSystem();
 });

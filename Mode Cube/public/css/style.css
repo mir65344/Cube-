@@ -578,7 +578,9 @@ h3 {
         font-size: 1.5rem;
     }
     
-    /* ДОПОЛНИТЕЛЬНЫЕ ИСПРАВЛЕНИЯ ДЛЯ МОБИЛЬНЫХ УРААА */
+    /*ИСПРАВЛЕНИЯ ДЛЯ МОБИЛЬНЫХ 
+    !нужен тест!
+    */
     .cube {
         transform: rotateX(-10deg) rotateY(10deg); /* меньший угол */
     }
@@ -592,13 +594,12 @@ h3 {
     }
     
     button, .nav-btn {
-        padding: 12px 20px; /* увеличим кнопки для сенсора */
-        min-height: 44px; /* минимальная высота для тача */
-    }
+        padding: 12px 20px; 
+        min-height: 44px; 
     
     .option {
         padding: 15px;
-        min-height: 44px; /* для удобного нажатия */
+        min-height: 44px; 
     }
 }
 
@@ -1161,11 +1162,11 @@ h3 {
     }
 }
 
-/* ================================
+/*
    СТИЛИ ДЛЯ СИСТЕМЫ ТЕСТОВ
-   ================================ */
+*/
 
-/* Выбор теста */
+/* выбор теста */
 .tests-selection {
     margin-bottom: 30px;
 }
@@ -1205,7 +1206,7 @@ h3 {
     box-shadow: 0 5px 15px rgba(0, 219, 222, 0.2);
 }
 
-/* Описание теста */
+/* описание теста */
 .test-meta {
     display: flex;
     gap: 20px;
@@ -1227,7 +1228,7 @@ h3 {
     margin-top: 30px;
 }
 
-/* Результаты теста */
+/* ркзультаты теста */
 .test-results {
     animation: fadeIn 0.5s ease;
 }
@@ -1531,7 +1532,7 @@ h3 {
     to { opacity: 1; transform: translateX(0); }
 }
 
-/* Адаптивность */
+/* Адаптивность для 3 п.*/
 @media (max-width: 768px) {
     .test-category-btn {
         min-width: 100%;
@@ -1579,7 +1580,7 @@ h3 {
     margin-top: 10px;
 }
 
-/* Дополнение к стилям для тестов */
+/* дополнение стилей теста */
 .emotions-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
@@ -1661,7 +1662,7 @@ h3 {
     line-height: 1.5;
 }
 
-/* Адаптивность для эмоций */
+/* адаптивностть эмоций */
 @media (max-width: 768px) {
     .emotions-grid {
         grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
@@ -1673,7 +1674,7 @@ h3 {
     }
 }
 
-/* Дополнительные стили для упрощенной системы тестов */
+/* Дополнительные стили для теста */
 .correct-answer {
     background: rgba(76, 175, 80, 0.3) !important;
     border-color: #4CAF50 !important;
@@ -1702,14 +1703,14 @@ h3 {
     font-weight: bold;
 }
 
-/* Стили для выбранных вариантов в теории */
+/* стили для выбранных вариантов в теории */
 .option.selected {
     background: rgba(100, 150, 255, 0.3) !important;
     border-color: rgba(100, 150, 255, 0.7) !important;
     transform: scale(1.02);
 }
 
-/* Анимация для ответов */
+/* анимация для ответов */
 @keyframes pulse {
     0% { transform: scale(1); }
     50% { transform: scale(1.05); }
@@ -1756,7 +1757,7 @@ h3 {
     border-left: 3px solid #00dbde;
 }
 
-/* Адаптивность */
+/* повторная адатпация*/
 @media (max-width: 768px) {
     .option {
         padding: 16px;
@@ -1769,7 +1770,7 @@ h3 {
     }
 }
 
-/* Стили для заголовков тестов */
+/* стили для заголовков тестов */
 .test-info {
     background: rgba(255, 255, 255, 0.05);
     padding: 20px;
@@ -1788,7 +1789,7 @@ h3 {
     line-height: 1.5;
 }
 
-/* Кнопки тестов */
+/* Ккопки тестов */
 .test-category-btn {
     padding: 18px 25px;
     border-radius: 12px;
@@ -1807,7 +1808,7 @@ h3 {
     border-color: #00dbde !important;
     box-shadow: 0 0 20px rgba(0, 219, 222, 0.3);
 }
-/* Стили для умных подсказок */
+/* стили для умных подсказок */
 .smart-insights {
     background: rgba(255, 255, 255, 0.05);
     border-radius: 15px;

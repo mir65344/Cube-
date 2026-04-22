@@ -1,21 +1,20 @@
 class MoodJournal {
     constructor() {
-        // Конфигурация
+        // Конфиги
         this.STORAGE_KEY = 'moodJournalEntries';
         this.ENTRIES_PER_PAGE = 10;
         this.currentFilter = 'all';
         this.chartPeriod = 'all';
         this.moodChart = null;
         
-        // Элементы DOM
+        // DOM
         this.elements = {};
         
-        // Инициализация
         this.init();
     }
 
     /**
-     * ИНИЦИАЛИЗАЦИЯ
+        ИНИЦИАЛИЗАЦИЯ
      */
     init() {
         this.cacheElements();
@@ -33,17 +32,17 @@ class MoodJournal {
     }
 
     /**
-     * КЭШИРОВАНИЕ ЭЛЕМЕНТОВ DOM
+     * ВЕСЬ JS УЖЕ НАХОДИТСЯ В ИСПОЛНЯЕМОМ ФАЙЛЕ ДЛЯ СТРАНИЦЫ. НЕ НУЖНО ВНОСИТЬ СЮДА ИЗМЕНЕНИЯ. ГИТХАБ НЕ ИНИЦИАЛИЗИРУЕТ ЭТОТ ФАЙЛ!!!
      */
     cacheElements() {
         this.elements = {
-            // Формы
+            // формы
             quickNote: document.getElementById('quick-note'),
             saveQuickBtn: document.getElementById('save-quick-entry'),
             moodOptions: document.querySelectorAll('.mood-option'),
             quickTags: document.querySelectorAll('.quick-tags .tag'),
             
-            // Детальная форма
+            // Ддтальная форма
             detailedForm: document.getElementById('detailed-form'),
             moodSlider: document.getElementById('mood-slider'),
             moodValue: document.getElementById('mood-value'),
@@ -55,15 +54,15 @@ class MoodJournal {
             saveDetailedBtn: document.getElementById('save-detailed-entry'),
             cancelDetailedBtn: document.getElementById('cancel-detailed'),
             
-            // Переключение форм
+            // переключение форм
             toggleDetailBtn: document.getElementById('toggle-detail-btn'),
             
-            // Фильтры
+            // фильтры
             timeFilter: document.getElementById('time-filter'),
             moodFilter: document.getElementById('mood-filter'),
             exportBtn: document.getElementById('export-btn'),
             
-            // Статистика
+            // статистика
             totalEntries: document.getElementById('total-entries'),
             avgMood: document.getElementById('avg-mood'),
             bestDay: document.getElementById('best-day'),
@@ -83,7 +82,7 @@ class MoodJournal {
     }
 
     /**
-     * ПРИВЯЗКА СОБЫТИЙ
+    ПРИВЯЗКА СОБЫТИЙ
      */
     bindEvents() {
         // Быстрая запись
@@ -95,14 +94,12 @@ class MoodJournal {
             tag.addEventListener('click', (e) => this.toggleTag(e.target));
         });
 
-        // Детальная форма
         this.elements.moodSlider.addEventListener('input', (e) => {
             this.elements.moodValue.textContent = e.target.value;
         });
         this.elements.saveDetailedBtn.addEventListener('click', () => this.saveDetailedEntry());
         this.elements.cancelDetailedBtn.addEventListener('click', () => this.toggleForm());
 
-        // Переключение форм
         this.elements.toggleDetailBtn.addEventListener('click', () => this.toggleForm());
 
         // Фильтры
@@ -124,7 +121,6 @@ class MoodJournal {
             });
         });
 
-        // Быстрые клавиши
         document.addEventListener('keydown', (e) => {
             if (e.ctrlKey && e.key === 's') {
                 e.preventDefault();
@@ -134,7 +130,7 @@ class MoodJournal {
     }
 
     /**
-     * РАБОТА С ХРАНИЛИЩЕМ
+     РАБОТА С ХРАНИЛИЩЕМ
      */
     
     // Загрузить все записи
@@ -176,7 +172,7 @@ class MoodJournal {
             createdAt: new Date().toISOString()
         };
 
-        this.entries.unshift(entry); // Добавляем в начало
+        this.entries.unshift(entry); 
         this.saveEntries();
         this.renderEntries();
         this.updateStats();
@@ -186,7 +182,7 @@ class MoodJournal {
         return entry;
     }
 
-    // Удалить запись
+
     deleteEntry(id) {
         if (confirm('Удалить эту запись?')) {
             this.entries = this.entries.filter(entry => entry.id !== id);
@@ -198,11 +194,7 @@ class MoodJournal {
         }
     }
 
-    /**
-     * РЕНДЕРИНГ ИНТЕРФЕЙСА
-     */
 
-    // Отобразить записи
     renderEntries() {
         const filteredEntries = this.filterEntries();
         
@@ -218,7 +210,7 @@ class MoodJournal {
 
         let html = '<h3>📅 История записей</h3>';
         
-        // Группировка по дням
+
         const groupedEntries = this.groupEntriesByDay(filteredEntries);
         
         Object.keys(groupedEntries).sort().reverse().forEach(date => {
@@ -227,7 +219,7 @@ class MoodJournal {
 
         this.elements.entriesList.innerHTML = html;
         
-        // Добавляем обработчики для кнопок удаления
+
         document.querySelectorAll('.delete-entry').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 const id = parseInt(e.target.closest('.journal-entry').dataset.id);
@@ -236,11 +228,11 @@ class MoodJournal {
         });
     }
 
-    // Отфильтровать записи
+
     filterEntries() {
         let filtered = [...this.entries];
 
-        // Фильтр по времени
+
         const now = new Date();
         switch (this.currentFilter) {
             case 'today':
@@ -275,7 +267,7 @@ class MoodJournal {
                 break;
         }
 
-        // Фильтр по настроению
+
         const moodFilter = this.elements.moodFilter.value;
         if (moodFilter !== 'all') {
             filtered = filtered.filter(entry => 
@@ -286,7 +278,6 @@ class MoodJournal {
         return filtered;
     }
 
-    // Группировать записи по дням
     groupEntriesByDay(entries) {
         return entries.reduce((groups, entry) => {
             const date = new Date(entry.date).toLocaleDateString('ru-RU', {
@@ -302,7 +293,6 @@ class MoodJournal {
         }, {});
     }
 
-    // Отобразить секцию дня
     renderDaySection(date, dayEntries) {
         const avgMood = dayEntries.reduce((sum, entry) => sum + entry.mood, 0) / dayEntries.length;
         const moodEmoji = this.getMoodEmoji(avgMood);
@@ -320,7 +310,6 @@ class MoodJournal {
         `;
     }
 
-    // Отобразить одну запись
     renderEntry(entry) {
         const date = new Date(entry.date);
         const time = date.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
@@ -351,11 +340,6 @@ class MoodJournal {
         `;
     }
 
-    /**
-     * СТАТИСТИКА И АНАЛИТИКА
-     */
-
-    // Обновить статистику
     updateStats() {
         if (this.entries.length === 0) {
             this.elements.totalEntries.textContent = '0';

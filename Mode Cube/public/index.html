@@ -5,6 +5,101 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Интерактивный куб настроения</title>
     <link rel="stylesheet" href="css/style.css">
+    <style>
+        /* Дисплеймер */
+        .disclaimer {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-left: 4px solid #a18cd1;
+            padding: 18px 24px;
+            border-radius: 14px;
+            margin: 10px 0 30px;
+            font-size: 0.95rem;
+            color: #c0c0e0;
+            line-height: 1.6;
+            max-width: 700px;
+            text-align: center;
+            animation: fadeIn 0.6s ease;
+        }
+
+        /* Абстрактные базовые градиенты граней — без красных/тёмных тонов */
+        .face.front { background: linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%) !important; }
+        .face.back  { background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%) !important; }
+        .face.right { background: linear-gradient(135deg, #f6d365 0%, #fda085 100%) !important; }
+        .face.left  { background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%) !important; }
+        .face.top   { background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%) !important; }
+        .face.bottom{ background: linear-gradient(135deg, #cd9cf2 0%, #f6f3ff 100%) !important; }
+
+        .face {
+            transition: background 0.9s ease, box-shadow 0.9s ease, filter 0.3s ease !important;
+            cursor: pointer;
+            border: 1px solid rgba(255,255,255,0.25) !important;
+        }
+        .face:hover {
+            filter: brightness(1.08);
+        }
+
+        /* Мягкая подсветка ответов — без тревожных цветов */
+        .option.answer-1 { background: rgba(161, 140, 209, 0.22) !important; border-color: rgba(161, 140, 209, 0.5) !important; box-shadow: 0 0 18px rgba(161, 140, 209, 0.15) !important; }
+        .option.answer-2 { background: rgba(129, 212, 250, 0.22) !important; border-color: rgba(129, 212, 250, 0.5) !important; box-shadow: 0 0 18px rgba(129, 212, 250, 0.15) !important; }
+        .option.answer-3 { background: rgba(206, 147, 216, 0.22) !important; border-color: rgba(206, 147, 216, 0.5) !important; box-shadow: 0 0 18px rgba(206, 147, 216, 0.15) !important; }
+        .option.answer-4 { background: rgba(179, 229, 252, 0.22) !important; border-color: rgba(179, 229, 252, 0.5) !important; box-shadow: 0 0 18px rgba(179, 229, 252, 0.15) !important; }
+
+        /* Модальное окно грани */
+        .face-overlay {
+            position: fixed; inset: 0;
+            background: rgba(10, 10, 25, 0.65);
+            backdrop-filter: blur(4px);
+            z-index: 998; display: none;
+        }
+        .face-overlay.active { display: block; animation: fadeIn 0.25s ease; }
+
+        .face-modal {
+            position: fixed;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%) scale(0.96);
+            background: rgba(25, 25, 45, 0.96);
+            backdrop-filter: blur(24px);
+            padding: 32px;
+            border-radius: 22px;
+            border: 1px solid rgba(255,255,255,0.12);
+            max-width: 420px;
+            width: 90%;
+            z-index: 999;
+            display: none;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.45);
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+        .face-modal.active {
+            display: block;
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+        }
+        .face-modal h4 {
+            margin-bottom: 12px;
+            color: #00dbde;
+            font-size: 1.25rem;
+        }
+        .face-modal p {
+            color: #d0d0f0;
+            line-height: 1.65;
+            font-size: 1.05rem;
+        }
+        .face-modal .close-btn {
+            position: absolute; top: 14px; right: 18px;
+            background: none; border: none;
+            color: rgba(255,255,255,0.6);
+            font-size: 1.6rem; cursor: pointer;
+            transition: color 0.2s;
+        }
+        .face-modal .close-btn:hover { color: #fff; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -12,6 +107,11 @@
             <h1>Куб Настроения</h1>
             <p class="subtitle">Покрутите фигуру и пройдите тест, чтобы увидеть как она меняет цвет и получить рекомендации</p>
         </header>
+
+        <div class="disclaimer">
+            💡 <strong>Мягкое напоминание:</strong> Этот куб — лишь абстрактное отражение вашего сегодняшнего состояния. 
+            Он не ставит диагнозов и не заменяет профессиональную помощь, если она вам нужна.
+        </div>
 
         <nav class="page-nav">
             <a href="index.html" class="nav-btn active">Главная</a>
@@ -21,12 +121,12 @@
 
         <div class="cube-container">
             <div class="cube" id="cube">
-                <div class="face front"></div>
-                <div class="face back"></div>
-                <div class="face right"></div>
-                <div class="face left"></div>
-                <div class="face top"></div>
-                <div class="face bottom"></div>
+                <div class="face front" data-face="front"></div>
+                <div class="face back"  data-face="back"></div>
+                <div class="face right" data-face="right"></div>
+                <div class="face left"  data-face="left"></div>
+                <div class="face top"   data-face="top"></div>
+                <div class="face bottom"data-face="bottom"></div>
             </div>
         </div>
 
@@ -38,75 +138,75 @@
         </div>
 
         <div class="quiz-container">
-            <h2>Как у вас дела? Пройдите тест и куб изменит цвет, отражая ваше настроение!</h2>
+            <h2>Как прошёл ваш день? Ответьте на несколько бытовых вопросов — и грани куба отразят ваше состояние</h2>
             
             <div class="question">
-                <h3>1. Как вы себя чувствуете сегодня?</h3>
+                <h3>1. Сколько часов вы спали прошлой ночью?</h3>
                 <div class="options">
-                    <div class="option" data-value="1">Отлично, полон энергии</div>
-                    <div class="option" data-value="2">Хорошо, всё нормально</div>
-                    <div class="option" data-value="3">Немного устал(а)</div>
-                    <div class="option" data-value="4">Плохо, нет сил</div>
+                    <div class="option" data-value="1">7–9 часов, проснулся бодрым и отдохнувшим</div>
+                    <div class="option" data-value="2">5–6 часов, немного устал, но нормально</div>
+                    <div class="option" data-value="3">3–4 часа, с трудом встаю и вожусь сонным</div>
+                    <div class="option" data-value="4">Почти не спал или не спал совсем</div>
                 </div>
             </div>
             
             <div class="question">
-                <h3>2. Как ваше настроение?</h3>
+                <h3>2. Как вы питались сегодня?</h3>
                 <div class="options">
-                    <div class="option" data-value="1">Прекрасное, радуюсь жизни</div>
-                    <div class="option" data-value="2">Спокойное, уравновешенное</div>
-                    <div class="option" data-value="3">Немного тревожное</div>
-                    <div class="option" data-value="4">Подавленное, грустное</div>
+                    <div class="option" data-value="1">Сбалансированно: завтрак, обед, ужин с овощами/белком</div>
+                    <div class="option" data-value="2">Перекусывал, но без фанатизма, был не голоден</div>
+                    <div class="option" data-value="3">Пропустил приём пищи или переел чего-то тяжёлого</div>
+                    <div class="option" data-value="4">Только кофе, энергетики или фастфуд на бегу</div>
                 </div>
             </div>
             
             <div class="question">
-                <h3>3. Насколько вы удовлетворены своей жизнью в последнее время?</h3>
+                <h3>3. Была ли сегодня физическая активность?</h3>
                 <div class="options">
-                    <div class="option" data-value="1">Полностью удовлетворен(а)</div>
-                    <div class="option" data-value="2">В основном доволен(а)</div>
-                    <div class="option" data-value="3">Есть некоторые проблемы</div>
-                    <div class="option" data-value="4">Неудовлетворен(а) многим</div>
+                    <div class="option" data-value="1">Да, тренировка, прогулка или подвижная работа 30+ мин</div>
+                    <div class="option" data-value="2">Небольшая разминка, пара выходов на лестницу/кухню</div>
+                    <div class="option" data-value="3">Почти не двигался — сидел за столом или на диване</div>
+                    <div class="option" data-value="4">Не выходил из комнаты/дома и не вставал почти совсем</div>
                 </div>
             </div>
 
             <div class="question">
-                <h3>4. Как вы спите?</h3>
+                <h3>4. Было ли сегодня качественное общение?</h3>
                 <div class="options">
-                    <div class="option" data-value="1">Отлично, просыпаюсь отдохнувшим(ей)</div>
-                    <div class="option" data-value="2">Нормально, высыпаюсь</div>
-                    <div class="option" data-value="3">Периодически бывает бессонница</div>
-                    <div class="option" data-value="4">Плохо, постоянно не высыпаюсь</div>
+                    <div class="option" data-value="1">Да, тёплый разговор с близким человеком или другом</div>
+                    <div class="option" data-value="2">Поверхностные разговоры — соседи, продавец, бариста</div>
+                    <div class="option" data-value="3">Только рабочие переписки, звонки по делам</div>
+                    <div class="option" data-value="4">Ни с кем не разговаривал, был в полной изоляции</div>
                 </div>
             </div>
 
             <div class="question">
-                <h3>5. Как проходит ваш день?</h3>
+                <h3>5. Удалось ли сегодня сосредоточиться на важном?</h3>
                 <div class="options">
-                    <div class="option" data-value="1">Продуктивно и интересно</div>
-                    <div class="option" data-value="2">Обычно, без особых событий</div>
-                    <div class="option" data-value="3">Беспокойно и суетливо</div>
-                    <div class="option" data-value="4">Тяжело и утомительно</div>
+                    <div class="option" data-value="1">Да, был в состоянии потока, задачи решались легко</div>
+                    <div class="option" data-value="2">Частично: работал с перерывами, но дело двигалось</div>
+                    <div class="option" data-value="3">Много отвлекался, к концу дня мало что сделано</div>
+                    <div class="option" data-value="4">Не мог собраться ни на одну задачу, всё валилось из рук</div>
                 </div>
             </div>
 
             <div class="question">
-                <h3>6. Как вы относитесь к будущему?</h3>
+                <h3>6. Делали ли вы сегодня что-то только для себя?</h3>
                 <div class="options">
-                    <div class="option" data-value="1">С оптимизмом и уверенностью</div>
-                    <div class="option" data-value="2">Спокойно, без особых ожиданий</div>
-                    <div class="option" data-value="3">С некоторой тревогой</div>
-                    <div class="option" data-value="4">С пессимизмом и беспокойством</div>
+                    <div class="option" data-value="1">Да, полноценный отдых: хобби, книга, ванна, музыка</div>
+                    <div class="option" data-value="2">Немного, но было приятно: чашка чая в тишине</div>
+                    <div class="option" data-value="3">Планировал, но так и не нашёл времени</div>
+                    <div class="option" data-value="4">Совсем нет — только обязанности, рутина и дедлайны</div>
                 </div>
             </div>
-            
+
             <button class="submit-btn" id="submit">Узнать результат</button>
             <div class="result" id="result"></div>
             <div class="recommendations" id="recommendations" style="display: none;"></div>
         </div>
 
         <div class="user-stats">
-            <h3>Ваша статистика настроения за поледнюю неделю</h3>
+            <h3>Ваша статистика настроения за последнюю неделю</h3>
             <div class="stats-grid">
                 <div class="stat-item">
                     <span class="stat-label">Текущий уровень</span>
@@ -128,9 +228,164 @@
         </div>
     </div>
 
+    <!-- Модальное окно для характеристик граней -->
+    <div class="face-overlay" id="face-overlay"></div>
+    <div class="face-modal" id="face-modal">
+        <button class="close-btn" id="face-modal-close">&times;</button>
+        <h4 id="face-modal-title">Характеристика</h4>
+        <p id="face-modal-text"></p>
+    </div>
+
     <script src="js/cube.js"></script>
     <script src="js/quiz.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Отключаем старую заливку всего куба одним цветом — оставляем мозаику граней
+            if (window.cubeController) {
+                window.cubeController.updateCubeColor = () => {};
+            }
+            localStorage.removeItem('cubeColor');
+            localStorage.removeItem('moodScore');
+
+            // Палитры для каждой грани: [value 1, 2, 3, 4] — все абстрактные и мягкие
+            const faceGradients = {
+                front: [
+                    'linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%)',
+                    'linear-gradient(135deg, #c2e9fb 0%, #a1c4fd 100%)',
+                    'linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%)',
+                    'linear-gradient(135deg, #f3e7e9 0%, #e3eeff 100%)'
+                ],
+                back: [
+                    'linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%)',
+                    'linear-gradient(135deg, #d4fc79 0%, #96e6a1 100%)',
+                    'linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%)',
+                    'linear-gradient(135deg, #eef9f1 0%, #e3f2fd 100%)'
+                ],
+                right: [
+                    'linear-gradient(135deg, #f6d365 0%, #fda085 100%)',
+                    'linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)',
+                    'linear-gradient(135deg, #fad0c4 0%, #ffd1ff 100%)',
+                    'linear-gradient(135deg, #fff5f0 0%, #fff9e6 100%)'
+                ],
+                left: [
+                    'linear-gradient(135deg, #89f7fe 0%, #66a6ff 100%)',
+                    'linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%)',
+                    'linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%)',
+                    'linear-gradient(135deg, #f0f4ff 0%, #e6f7ff 100%)'
+                ],
+                top: [
+                    'linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)',
+                    'linear-gradient(135deg, #fad0c4 0%, #ffd1ff 100%)',
+                    'linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%)',
+                    'linear-gradient(135deg, #fff0f5 0%, #f0f8ff 100%)'
+                ],
+                bottom: [
+                    'linear-gradient(135deg, #cd9cf2 0%, #f6f3ff 100%)',
+                    'linear-gradient(135deg, #d299c2 0%, #fef9d7 100%)',
+                    'linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%)',
+                    'linear-gradient(135deg, #f8f5ff 0%, #f0f7ff 100%)'
+                ]
+            };
+
+            const faceNames = ['front', 'back', 'right', 'left', 'top', 'bottom'];
+
+            const faceAspects = {
+                front: { title: 'Восстановление', text: 'Качество сна напрямую влияет на когнитивные функции. Даже +1 час сна может повысить концентрацию на 30% и снизить раздражительность.' },
+                back:  { title: 'Энергия',       text: 'Регулярное питание стабилизирует уровень глюкозы и настроение. Пропуск приёмов пищи снижает продуктивность и может вызывать тревожность.' },
+                right: { title: 'Движение',       text: 'Физическая активность запускает выработку эндорфинов. Даже 10-минутная прогулка снижает тревожность и перезагружает мозг.' },
+                left:  { title: 'Связи',          text: 'Социальные контакты — основа психологической устойчивости. Одно искреннее разговор может перезагрузить эмоциональный фон на весь день.' },
+                top:   { title: 'Фокус',          text: 'Состояние потока возникает при балансе сложности задачи и ваших навыков. Короткие перерывы повышают продуктивность лучше, чем многочасовая работа.' },
+                bottom:{ title: 'Отдых',          text: 'Восстановление — не лень, а инвестиция в ресурс. Без перерывов мозг переходит в режим «выгорания», и даже простые дела даются с трудом.' }
+            };
+
+            // Устанавливаем начальные мягкие градиенты
+            faceNames.forEach(face => {
+                const el = document.querySelector(`.face.${face}`);
+                if (el) {
+                    el.style.background = faceGradients[face][1];
+                    el.style.boxShadow = 'inset 0 0 30px rgba(255,255,255,0.12), 0 0 25px rgba(160,200,255,0.08)';
+                }
+            });
+
+            // При выборе ответа подсвечиваем соответствующую грань
+            const questions = document.querySelectorAll('.quiz-container .question');
+            questions.forEach((q, index) => {
+                const face = faceNames[index];
+                if (!face) return;
+                const opts = q.querySelectorAll('.option');
+                opts.forEach(opt => {
+                    opt.addEventListener('click', () => {
+                        const val = parseInt(opt.getAttribute('data-value')) || 2;
+                        const el = document.querySelector(`.face.${face}`);
+                        if (el && faceGradients[face]) {
+                            const grad = faceGradients[face][val - 1] || faceGradients[face][1];
+                            el.style.background = grad;
+                            el.setAttribute('data-answer', val);
+                            el.style.boxShadow = `inset 0 0 30px rgba(255,255,255,0.18), 0 0 35px rgba(180,210,255,0.18)`;
+                        }
+                    });
+                });
+            });
+
+            // Отличие клика от перетаскивания куба
+            let dragStart = { x: 0, y: 0 };
+            let hasDragged = false;
+            const cubeEl = document.getElementById('cube');
+            if (cubeEl) {
+                cubeEl.addEventListener('mousedown', (e) => {
+                    hasDragged = false;
+                    dragStart = { x: e.clientX, y: e.clientY };
+                });
+                cubeEl.addEventListener('mousemove', (e) => {
+                    const dx = Math.abs(e.clientX - dragStart.x);
+                    const dy = Math.abs(e.clientY - dragStart.y);
+                    if (dx > 4 || dy > 4) hasDragged = true;
+                });
+                cubeEl.addEventListener('touchstart', (e) => {
+                    hasDragged = false;
+                    dragStart = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+                }, { passive: true });
+                cubeEl.addEventListener('touchmove', (e) => {
+                    const dx = Math.abs(e.touches[0].clientX - dragStart.x);
+                    const dy = Math.abs(e.touches[0].clientY - dragStart.y);
+                    if (dx > 6 || dy > 6) hasDragged = true;
+                }, { passive: true });
+            }
+
+            // Модальное окно
+            const modal = document.getElementById('face-modal');
+            const overlay = document.getElementById('face-overlay');
+            const mTitle = document.getElementById('face-modal-title');
+            const mText = document.getElementById('face-modal-text');
+            const mClose = document.getElementById('face-modal-close');
+
+            function openModal(face) {
+                const info = faceAspects[face];
+                if (!info) return;
+                mTitle.textContent = info.title;
+                mText.textContent = info.text;
+                modal.classList.add('active');
+                overlay.classList.add('active');
+            }
+            function closeModal() {
+                modal.classList.remove('active');
+                overlay.classList.remove('active');
+            }
+
+            faceNames.forEach(face => {
+                const el = document.querySelector(`.face.${face}`);
+                if (!el) return;
+                el.addEventListener('click', () => {
+                    if (!hasDragged) openModal(face);
+                });
+            });
+
+            overlay.addEventListener('click', closeModal);
+            mClose.addEventListener('click', closeModal);
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') closeModal();
+            });
+        });
+    </script>
 </body>
-
 </html>
-
